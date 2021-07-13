@@ -1,0 +1,127 @@
+﻿<!--
+# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     10-15-2020
+# Copyright:   (c) BLS OPS LLC. 2020
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+-->
+
+@model List<Steplates>;
+@{ ViewData["Title"] = "Templates"; }
+
+<div>
+    <div class="d-flex justify-content-between align-items-center">
+        <form method="post" asp-controller="Home" asp-action="CreateSteplate">
+            <button type="submit" class="btn-neon-green" id="save-event-btn">CREATE TEMPLATE</button>
+        </form>
+        <button type="button" class="btn-neon-yellow" id="import-btn" data-toggle="modal" data-target="#importModal">IMPORT</button>
+        <button type="button" class="btn-neon-yellow" id="export-btn" onclick="location.href='/Home/ExportTemplates'">EXPORT</button>
+        <button type="button" class="btn-neon-red" id="delete-all-btn" data-toggle="modal" data-target="#deleteModal">DELETE ALL</button>
+    </div>
+    <div class="dialog-box_success" data-title="Templates">
+        <input type="text" class="bg-dark text-light" style="float: right;" placeholder="FILTER" id="filterInput" onkeyup="filterSteplates();" />
+        <br /><br />
+        <ul class="list-group" id="ulGroup">
+            <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action bg-dark text-light">
+                <span>Event</span>
+                <span>Risk</span>
+            </li>
+            @{ foreach (var steplate in Model)
+                {
+                    var data = new Dictionary<string, string> { { "steplateId", steplate.Id } };
+    <a asp-controller="Home" asp-action="EditSteplate" asp-all-route-data="@data" class="event">
+    <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-action bg-dark">
+        <span class="event">@steplate.Event</span>
+        @{ string riskClass = "";
+            if (steplate.Risk == "Very Low") { riskClass = "very-low"; }
+            else if (steplate.Risk == "Low") { riskClass = "low"; }
+            else if (steplate.Risk == "Moderate") { riskClass = "mod"; }
+            else if (steplate.Risk == "High") { riskClass = "high"; }
+            else if (steplate.Risk == "Very High") { riskClass = "very-high"; }
+<span class="risk-@riskClass">@steplate.Risk</span> }
+    </li>
+    </a> } }
+        </ul>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Delete All -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_error">
+                <center>
+                    <p>Are you sure you want to delete all templates?</p>
+                    <p>Changes cannot be undone.</p>
+                </center>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form asp-action="DeleteAllTemplates" asp-controller="Home" method="post">
+                    <button type="submit" class="btn btn-danger">DELETE ALL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="ImportTemplates">
+                <div class="modal-body dialog-box_warning">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input custom-file-input-warning bg-dark text-light" id="customFile" name="file" />
+                        <label class="custom-file-label custom-file-label-warning bg-dark text-light" for="customFile">Choose JSON Template Pack</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-warning" value="IMPORT" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Export -->
+<div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_error">
+                
+            </div>
+            <div class="modal-footer">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function filterSteplates() {
+            var input = document.getElementById("filterInput");
+            var filter = input.value.toUpperCase();
+
+            var ul = document.getElementById("ulGroup");
+            var rows = ul.children;
+            for (var i = 1; i < rows.length; i++) {
+                var content = rows[i].children[0].textContent.toUpperCase();
+                if (content.indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+}

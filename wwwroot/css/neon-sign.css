@@ -1,0 +1,126 @@
+﻿@font-face {
+    font-family: 'sportrop';
+    src: url('../fonts/Sportrop.ttf') format('truetype');
+}
+
+.neon {
+    font-family: sportrop;
+    color: #66ff66;
+    line-height: 24px;
+    text-shadow: 0 0 2px #00cc00;
+    animation: neon 1s ease infinite;
+    -moz-animation: neon 1s ease infinite;
+    -webkit-animation: neon 1s ease infinite;
+}
+
+@keyframes neon {
+    0%, 100% {
+        color: #66ff66;
+        text-shadow: 0 0 1vw #66ff66, 0 0 3vw #66ff66, 0 0 10vw #66ff66, 0 0 10vw #66ff66, 0 0 .4vw #66ff66, .275vw .275vw .1vw #009900;
+    }
+
+    50% {
+        color: #009900;
+        text-shadow: 0 0 .5vw #009900, 0 0 1.5vw #009900, 0 0 5vw #009900, 0 0 5vw #009900, 0 0 .2vw #009900, .275vw .275vw .1vw #009900;
+    }
+}
+
+/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+html {
+    background-color: #000;
+    color: #fff;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+}
+
+header {
+    background-color: #000;
+    color: #fff;
+}
+
+nav.navbar {
+    background-color: #000;
+    color: #fff;
+}
+
+div.container {
+    background-color: #000;
+    color: #fff;
+}
+
+
+
+a.etm-logo, a, a:hover {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+    color: #4cff00;
+}
+
+/* Provide sufficient contrast against white background */
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
+}

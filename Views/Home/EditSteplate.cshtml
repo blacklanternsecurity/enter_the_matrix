@@ -1,0 +1,732 @@
+﻿<!--
+# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     06-07-2021
+# Copyright:   (c) BLS OPS LLC. 2021
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+-->
+
+@model Steplates
+@{ ViewData["Title"] = "Edit Template"; }
+
+<div>
+    <form asp-action="EditSteplate" asp-controller="Home" method="post">
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="submit" class="btn-neon-green" id="save-event-btn">SAVE TEMPLATE</button>
+            <button type="button" class="btn-neon-red" data-toggle="modal" data-target="#deleteModal" id="delete-event-btn">DELETE TEMPLATE</button>
+        </div>
+        <div class="dialog-box_success" data-title="Edit Template">
+
+            @{
+                        <div class="form-group factor-container">
+                            <label for="mitre-ttp">MITRE ATT&CK Technique ID</label>
+                            <input onkeyup="mitreSearchFilter();" type="text" style="float: right;" class="bg-dark text-light" id="mitreFilter" placeholder="FILTER">
+                            @{ foreach (string line in ViewBag.techniques.htmlContent)
+                                {
+                                    @Html.Raw(line);
+                                } }
+                        </div>
+
+                                        <div class="form-group factor-container">
+                                            <label for="event-textarea">Event Description</label>
+                                            <textarea name="ev" rows="3" id="event-textarea" class="form-control text-light bg-dark" placeholder="" required>@Model.Event</textarea>
+                                        </div>
+
+                                                    <div class="form-group factor-container">
+                                                        <label for="threat-list">Threat Source</label>
+                                                        <svg data-toggle="modal" data-target="#threatSourceInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                            <circle cx="8" cy="4.5" r="1" />
+                                                        </svg>
+                                                        <select name="source" id="threat-list" class="form-control text-light bg-dark" placeholder="">
+                                                            @{ foreach (var source in ViewBag.sources.sources)
+                                                                            {
+                                                                                if (Model.ThreatSource == source)
+                                                                                {
+                                                                <option selected value="@Model.ThreatSource">@Model.ThreatSource</option> }
+                                                                                else
+                                                                                {
+                                                                <option value="@source">@source</option> }
+                                                                            } }
+                                                        </select>
+                                                    </div>
+
+                                                                <div class="form-group factor-container">
+                                                                    <label for="capability-range">Attacker's Minimal Capability Required</label>
+                                                                    <svg data-toggle="modal" data-target="#capabilityInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                        <circle cx="8" cy="4.5" r="1" />
+                                                                    </svg>
+                                                                    <input name="capability" type="range" id="capability-range" class="custom-range" min="0" max="10" placeholder="" value="@Model.Capability" />
+                                                                    <div class="ticks">
+                                                                        <p class="ticks">VL</p>
+                                                                        <p class="ticks">1</p>
+                                                                        <p class="ticks">L</p>
+                                                                        <p class="ticks">3</p>
+                                                                        <p class="ticks">4</p>
+                                                                        <p class="ticks">M</p>
+                                                                        <p class="ticks">6</p>
+                                                                        <p class="ticks">7</p>
+                                                                        <p class="ticks">H</p>
+                                                                        <p class="ticks">9</p>
+                                                                        <p class="ticks">VH</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                            <div class="form-group factor-container">
+                                                                                <label for="intent-range">Attacker's Minimal Intent Required</label>
+                                                                                <svg data-toggle="modal" data-target="#intentInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                    <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                    <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                    <circle cx="8" cy="4.5" r="1" />
+                                                                                </svg>
+                                                                                <input name="intent" type="range" id="intent-range" class="custom-range" min="0" max="10" placeholder="" value="@Model.Intent" />
+                                                                                <div class="ticks">
+                                                                                    <p class="ticks">VL</p>
+                                                                                    <p class="ticks">1</p>
+                                                                                    <p class="ticks">L</p>
+                                                                                    <p class="ticks">3</p>
+                                                                                    <p class="ticks">4</p>
+                                                                                    <p class="ticks">M</p>
+                                                                                    <p class="ticks">6</p>
+                                                                                    <p class="ticks">7</p>
+                                                                                    <p class="ticks">H</p>
+                                                                                    <p class="ticks">9</p>
+                                                                                    <p class="ticks">VH</p>
+                                                                                </div>
+                                                                            </div>
+
+                                                                                        <div class="form-group factor-container">
+                                                                                            <label for="targeting-range">Level of Targeting Required</label>
+                                                                                            <svg data-toggle="modal" data-target="#targetingInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                <circle cx="8" cy="4.5" r="1" />
+                                                                                            </svg>
+                                                                                            <input name="targeting" type="range" id="targeting-range" class="custom-range" min="0" max="10" placeholder="" value="@Model.Targeting" />
+                                                                                            <div class="ticks">
+                                                                                                <p class="ticks">VL</p>
+                                                                                                <p class="ticks">1</p>
+                                                                                                <p class="ticks">L</p>
+                                                                                                <p class="ticks">3</p>
+                                                                                                <p class="ticks">4</p>
+                                                                                                <p class="ticks">M</p>
+                                                                                                <p class="ticks">6</p>
+                                                                                                <p class="ticks">7</p>
+                                                                                                <p class="ticks">H</p>
+                                                                                                <p class="ticks">9</p>
+                                                                                                <p class="ticks">VH</p>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                                    <div class="form-group factor-container">
+                                                                                                        <label for="relevance-list">Relevance to Findings</label>
+                                                                                                        <svg data-toggle="modal" data-target="#relevanceInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                            <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                            <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                            <circle cx="8" cy="4.5" r="1" />
+                                                                                                        </svg>
+                                                                                                        <select name="relevance" id="relevance-list" class="form-control text-light bg-dark" placeholder="">
+                                                                                                            @{ foreach (var relevance in ViewBag.relevances.nistDescriptions.Keys)
+                                                                                                                            {
+                                                                                                                                if (Model.Relevance == relevance)
+                                                                                                                                {
+                                                                                                                <option selected value="@Model.Relevance">@Model.Relevance</option> }
+                                                                                                                                else
+                                                                                                                                {
+                                                                                                                <option value="@relevance">@relevance</option> }
+                                                                                                                            } }
+                                                                                                        </select>
+                                                                                                    </div>
+
+                                                                                                                <div class="form-group factor-container">
+                                                                                                                    <label for="initiation-range">Likelihood for Attack Initiation</label>
+                                                                                                                    <svg data-toggle="modal" data-target="#initiationInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                                        <circle cx="8" cy="4.5" r="1" />
+                                                                                                                    </svg>
+                                                                                                                    <input name="initiation" type="range" id="initiation-range" oninput="CalculateOverallLikelihood()" class="custom-range" min="0" max="10" placeholder="" value="@Model.Initiation" />
+                                                                                                                    <div class="ticks">
+                                                                                                                        <p class="ticks">VL</p>
+                                                                                                                        <p class="ticks">1</p>
+                                                                                                                        <p class="ticks">L</p>
+                                                                                                                        <p class="ticks">3</p>
+                                                                                                                        <p class="ticks">4</p>
+                                                                                                                        <p class="ticks">M</p>
+                                                                                                                        <p class="ticks">6</p>
+                                                                                                                        <p class="ticks">7</p>
+                                                                                                                        <p class="ticks">H</p>
+                                                                                                                        <p class="ticks">9</p>
+                                                                                                                        <p class="ticks">VH</p>
+                                                                                                                    </div>
+                                                                                                                </div>
+
+                                                                                                                            <div class="form-group factor-container">
+                                                                                                                                <label for="vulnerability">Finding Reference</label>
+                                                                                                                                <textarea name="vulnerability" id="vulnerability" rows="2" class="form-control text-light bg-dark" oninput="enabler()" placeholder="">@Model.Vulnerability</textarea>
+                                                                                                                            </div>
+
+                                                                                                                                        <div class="form-group factor-container">
+                                                                                                                                            <label for="severity-and-pervasiveness-range">Vulnerability Severity</label>
+                                                                                                                                            <svg data-toggle="modal" data-target="#severityInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                                                                <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                                                                <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                                                                <circle cx="8" cy="4.5" r="1" />
+                                                                                                                                            </svg>
+                                                                                                                                            @{ if (Model.Vulnerability != null)
+                                                                                                                                                            {
+                                                                                                                                                                if (Model.Vulnerability.ToString() == "")
+                                                                                                                                                                {
+                                                                                                                                                <input name="severity" type="range" id="severity-and-pervasiveness-range" class="custom-range" min="0" max="10" placeholder="" disabled value="@Model.Severity" /> }
+                                                                                                                                                                else
+                                                                                                                                                                {
+                                                                                                                                                <input name="severity" type="range" id="severity-and-pervasiveness-range" class="custom-range" min="0" max="10" placeholder="" value="@Model.Severity" /> }
+                                                                                                                                                            }
+                                                                                                                                                            else
+                                                                                                                                                            {
+                                                                                                                                                <input name="severity" type="range" id="severity-and-pervasiveness-range" class="custom-range" min="0" max="10" placeholder="" disabled value="@Model.Severity" /> } }
+                                                                                                                                            <div class="ticks">
+                                                                                                                                                <p class="ticks">VL</p>
+                                                                                                                                                <p class="ticks">1</p>
+                                                                                                                                                <p class="ticks">L</p>
+                                                                                                                                                <p class="ticks">3</p>
+                                                                                                                                                <p class="ticks">4</p>
+                                                                                                                                                <p class="ticks">M</p>
+                                                                                                                                                <p class="ticks">6</p>
+                                                                                                                                                <p class="ticks">7</p>
+                                                                                                                                                <p class="ticks">H</p>
+                                                                                                                                                <p class="ticks">9</p>
+                                                                                                                                                <p class="ticks">VH</p>
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+
+                                                                                                                                                    <div class="form-group factor-container">
+                                                                                                                                                        <label for="vulnerability">Predisposing Condition</label>
+                                                                                                                                                        <textarea name="condition" id="condition" rows="2" class="form-control text-light bg-dark" oninput="enabler()" placeholder="">@Model.Condition</textarea>
+                                                                                                                                                    </div>
+
+                                                                                                                                                                <div class="form-group factor-container">
+                                                                                                                                                                    <label for="pervasiveness-range">Pervasiveness of Predisposing Conditions</label>
+                                                                                                                                                                    <svg data-toggle="modal" data-target="#pervasivenessInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                                                                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                                                                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                                                                                        <circle cx="8" cy="4.5" r="1" />
+                                                                                                                                                                    </svg>
+                                                                                                                                                                    @{ if (Model.Condition != null)
+                                                                                                                                                                                    {
+                                                                                                                                                                                        if (Model.Condition.ToString() == "")
+                                                                                                                                                                                        {
+                                                                                                                                                                        <input name="pervasiveness" type="range" id="pervasiveness-range" class="custom-range" min="0" max="10" placeholder="" disabled value="@Model.Pervasiveness" /> }
+                                                                                                                                                                                        else
+                                                                                                                                                                                        {
+                                                                                                                                                                        <input name="pervasiveness" type="range" id="pervasiveness-range" class="custom-range" min="0" max="10" placeholder="" value="@Model.Pervasiveness" /> }
+                                                                                                                                                                                    }
+                                                                                                                                                                                    else
+                                                                                                                                                                                    {
+                                                                                                                                                                        <input name="pervasiveness" type="range" id="pervasiveness-range" class="custom-range" min="0" max="10" placeholder="" disabled value="@Model.Pervasiveness" /> } }
+                                                                                                                                                                    <div class="ticks">
+                                                                                                                                                                        <p class="ticks">VL</p>
+                                                                                                                                                                        <p class="ticks">1</p>
+                                                                                                                                                                        <p class="ticks">L</p>
+                                                                                                                                                                        <p class="ticks">3</p>
+                                                                                                                                                                        <p class="ticks">4</p>
+                                                                                                                                                                        <p class="ticks">M</p>
+                                                                                                                                                                        <p class="ticks">6</p>
+                                                                                                                                                                        <p class="ticks">7</p>
+                                                                                                                                                                        <p class="ticks">H</p>
+                                                                                                                                                                        <p class="ticks">9</p>
+                                                                                                                                                                        <p class="ticks">VH</p>
+                                                                                                                                                                    </div>
+                                                                                                                                                                </div>
+
+                                                                                                                                                                            <div class="form-group factor-container">
+                                                                                                                                                                                <label for="mitigation">Mitigation Observed</label>
+                                                                                                                                                                                <textarea name="mitigation" rows="2" id="mitigation" class="form-control text-light bg-dark" placeholder="">@Model.Mitigation</textarea>
+                                                                                                                                                                            </div>
+
+                                                                                                                                                                                        <div class="form-group factor-container">
+                                                                                                                                                                                            <label for="adverse-range">Likelihood of Adverse Impact</label>
+                                                                                                                                                                                            <svg data-toggle="modal" data-target="#adverseInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                                                                                                                <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                                                                                                                <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                                                                                                                <circle cx="8" cy="4.5" r="1" />
+                                                                                                                                                                                            </svg>
+                                                                                                                                                                                            <input name="adverse" type="range" id="adverse-range" oninput="CalculateOverallLikelihood()" class="custom-range" min="0" max="10" placeholder="" value="@Model.Adverse" />
+                                                                                                                                                                                            <div class="ticks">
+                                                                                                                                                                                                <p class="ticks">VL</p>
+                                                                                                                                                                                                <p class="ticks">1</p>
+                                                                                                                                                                                                <p class="ticks">L</p>
+                                                                                                                                                                                                <p class="ticks">3</p>
+                                                                                                                                                                                                <p class="ticks">4</p>
+                                                                                                                                                                                                <p class="ticks">M</p>
+                                                                                                                                                                                                <p class="ticks">6</p>
+                                                                                                                                                                                                <p class="ticks">7</p>
+                                                                                                                                                                                                <p class="ticks">H</p>
+                                                                                                                                                                                                <p class="ticks">9</p>
+                                                                                                                                                                                                <p class="ticks">VH</p>
+                                                                                                                                                                                            </div>
+                                                                                                                                                                                        </div>
+
+                                                                                                                                                                                                    <div class="form-group factor-container">
+                                                                                                                                                                                                        <label for="likelihood">Overall Likelihood (Automatic)</label>
+                                                                                                                                                                                                        <input name="likelihood" readonly type="text" id="likelihood" class="form-control text-light bg-dark" placeholder="" value="@Model.Likelihood" />
+                                                                                                                                                                                                    </div>
+
+                                                                                                                                                                                                                <div class="form-group factor-container">
+                                                                                                                                                                                                                    <label for="impact-range">Level of Impact</label>
+                                                                                                                                                                                                                    <svg data-toggle="modal" data-target="#impactInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                                                                                                                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                                                                                                                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                                                                                                                                        <circle cx="8" cy="4.5" r="1" />
+                                                                                                                                                                                                                    </svg>
+                                                                                                                                                                                                                    <input name="impact" type="range" id="impact-range" oninput="CalculateOverallRisk()" class="custom-range" min="0" max="10" placeholder="" value="@Model.Impact" />
+                                                                                                                                                                                                                    <div class="ticks">
+                                                                                                                                                                                                                        <p class="ticks">VL</p>
+                                                                                                                                                                                                                        <p class="ticks">1</p>
+                                                                                                                                                                                                                        <p class="ticks">L</p>
+                                                                                                                                                                                                                        <p class="ticks">3</p>
+                                                                                                                                                                                                                        <p class="ticks">4</p>
+                                                                                                                                                                                                                        <p class="ticks">M</p>
+                                                                                                                                                                                                                        <p class="ticks">6</p>
+                                                                                                                                                                                                                        <p class="ticks">7</p>
+                                                                                                                                                                                                                        <p class="ticks">H</p>
+                                                                                                                                                                                                                        <p class="ticks">9</p>
+                                                                                                                                                                                                                        <p class="ticks">VH</p>
+                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                </div>
+
+                                                                                                                                                                                                                            <div class="form-group factor-container">
+                                                                                                                                                                                                                                <label for="risk">Overall Risk (Automatic)</label>
+                                                                                                                                                                                                                                <svg data-toggle="modal" data-target="#riskInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                                                                                                                                                                                                    <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                                                                                                                                                                                                                    <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                                                                                                                                                                                                                    <circle cx="8" cy="4.5" r="1" />
+                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                <input name="risk" readonly type="text" id="risk" class="form-control text-light bg-dark" placeholder="" value="@Model.Risk" />
+                                                                                                                                                                                                                            </div>
+
+                                                                                                                                                                                                                                        <input type="hidden" value="@Model.Id" name="steplateId" />
+                                                                                                                                                                                                                                                    <input type="hidden" value="@Model.Date" name="dateCreated" />
+                                                                                                                                                                                                                                                                <input type="hidden" value="@Model.AddedBy" name="addedBy" /> }
+        </div>
+    </form>
+    <button class="" onclick="topFunction()" id="scrollBtn" title="Go to top"><span class="material-icons">arrow_upward</span></button>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_error">
+                <center>
+                    <p>Are you sure you want to delete this template?</p>
+                    <p>Changes cannot be undone.</p>
+                </center>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form asp-action="DeleteSteplate" asp-controller="Home" method="post">
+                    <input name="steplateId" type="hidden" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">DELETE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Capability Info Modal -->
+<div class="modal fade" id="capabilityInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.capabilities.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.capabilities.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Intent Info Modal -->
+<div class="modal fade" id="intentInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.intents.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.intents.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Targeting Info Modal -->
+<div class="modal fade" id="targetingInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.targetings.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.targetings.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Severity Info Modal -->
+<div class="modal fade" id="severityInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.severities.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.severities.blsDescriptions[entry.Key];</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pervasiveness Info Modal -->
+<div class="modal fade" id="pervasivenessInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.pervasivenesses.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.pervasivenesses.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Initiation Info Modal -->
+<div class="modal fade" id="initiationInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.initiations.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.initiations.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Adverse Info Modal -->
+<div class="modal fade" id="adverseInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.adverses.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.adverses.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Impact Info Modal -->
+<div class="modal fade" id="impactInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.impacts.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.impacts.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Relevance Info Modal -->
+<div class="modal fade" id="relevanceInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                        <th>BLS Description</th>
+                    </tr>
+                    @{ foreach (var entry in ViewBag.relevances.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                            <td>@ViewBag.relevances.blsDescriptions[entry.Key]</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Threat Source Info Modal -->
+<div class="modal fade" id="threatSourceInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>NIST 800-30 Description</th>
+                    </tr>
+                    @{
+                                    <tr>
+                                        <td>@ViewBag.sources.nistDescription</td>
+                                    </tr> }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vulnerability Info Modal -->
+<div class="modal fade" id="vulnerabilityInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>NIST 800-30 Description</th>
+                    </tr>
+                    @{
+                                    <tr>
+                                        <td>@ViewBag.vulnerabilities.nistDescription</td>
+                                    </tr> }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Info Modal -->
+<div class="modal fade" id="riskInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <table class="table table-dark table-bordered">
+                    <tr>
+                        <th>Values</th>
+                        <th>NIST 800-30 Description</th>
+                    </tr>
+                    @{ foreach (var risk in ViewBag.risks.nistDescriptions)
+                                    {
+                        <tr>
+                            <td>@risk.Key</td>
+                            <td>@risk.Value</td>
+                        </tr> } }
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="~/js/FactorCalculator.js"></script>
+
+    <script>
+        function enabler() {
+            var condition = document.getElementById("condition").value;
+            if (condition === "") {
+                document.getElementById("pervasiveness-range").disabled = true;
+            }
+            else {
+                document.getElementById("pervasiveness-range").disabled = false;
+            }
+
+            var vulnerability = document.getElementById("vulnerability").value;
+            if (vulnerability === "") {
+                document.getElementById("severity-and-pervasiveness-range").disabled = true;
+            }
+            else {
+                document.getElementById("severity-and-pervasiveness-range").disabled = false;
+            }
+        }
+    </script>
+
+    <script>
+        scrollBtn = document.getElementById("scrollBtn");
+
+        window.onscroll = function () { scrollFunction(); }
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollBtn.style.display = "block";
+            }
+            else {
+                scrollBtn.style.display = "none";
+            }
+        }
+
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+        function mitreSearchFilter() {
+            var accordion = document.getElementById("accordion");
+            var sections = accordion.children;
+            var input = document.getElementById("mitreFilter");
+            var filter = input.value.toUpperCase();
+
+            // iterate through the sections
+            for (var i = 0; i < sections.length; i++) {
+                var inSection = false;
+                // iterate through the tactics
+                var tactics = sections[i].children[1].children;
+                for (var j = 0; j < tactics.length; j++) {
+                    var inTactic = false;
+                    // iterate through the techniques
+                    var techniques = tactics[j].children[0].children[1].children;
+                    for (var k = 0; k < techniques.length; k++) {
+                        var inTechnique = false;
+                        if (techniques[k].textContent.toUpperCase().indexOf(filter) > -1) {
+                            techniques[k].style.display = "";
+                            inTechnique = true;
+                            inTactic = true;
+                        } else {
+                            techniques[k].style.display = "none";
+                        }
+                    }
+                    if (inTactic) { tactics[j].style.display = ""; inSection = true; }
+                    else { tactics[j].style.display = "none"; }
+                }
+                if (inSection) { sections[i].style.display = ""; }
+                else { sections[i].style.display = "none"; }
+            }
+
+        }
+    </script>
+}

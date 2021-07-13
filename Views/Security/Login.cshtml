@@ -1,0 +1,58 @@
+﻿<!--
+# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     10-15-2020
+# Copyright:   (c) BLS OPS LLC. 2020
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+-->
+
+@model Account;
+@{ Layout = null;
+                ViewData["Title"] = "Login"; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Enter_The_Matrix</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/neon-sign.css" />
+    <link href="~/css/neon-button-green.css" rel="stylesheet" />
+</head>
+<body>
+    <br /><br /><br /><br /><br /><br />
+    <center>
+        <h1 class="neon">Enter_The_Matrix</h1>
+        <br /><br /><br /><br /><br />
+        <form method="post" asp-controller="Security" asp-action="Login">
+            <div class="form-group">
+                <input placeholder="Username" id="user-field" class="form-control-sm text-light bg-dark" asp-for="userName" />
+                <span asp-validation-for="userName"></span>
+            </div>
+
+            <div class="form-group">
+                <input placeholder="Password" id="pass-field" class="form-control-sm text-light bg-dark" asp-for="password" />
+                <span asp-validation-for="password"></span>
+            </div>
+
+            <div class="form-group col-md-1">
+                <select name="method" class="form-control text-light bg-dark">
+                    <option value="local">ETM</option>
+                    <option value="ldap">LDAP</option>
+                    <option value="admin">ADMIN</option>
+                </select>
+            </div>
+            <br /><br /><br /><br />
+            <button type="submit" id="neon-text" class="btn-neon-green">ENTER</button>
+        </form>
+    </center>
+    <footer>
+        <center>
+            <br /><br /><br />
+            <span style="color: #4cff00">&copy; BLS OPS LLC. @DateTime.Now.Year</span>
+        </center>
+    </footer>
+</body>
+</html>

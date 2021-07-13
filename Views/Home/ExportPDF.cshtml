@@ -1,0 +1,167 @@
+﻿<!--
+# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     06-04-2021
+# Copyright:   (c) BLS OPS LLC. 2021
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+-->
+
+@{ Layout = null; ViewData["Title"] = ViewBag.FileName; }
+
+<html>
+<head>
+    <title>@ViewBag.FileName</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/neon-button-green.css" />
+    <link rel="stylesheet" href="~/css/neon-button-yellow.css" />
+    <link rel="stylesheet" media="print" href="~/css/print.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <style media="screen">
+        .report-title {
+            font-weight: bold;
+        }
+        .scenario-label {
+            font-weight: bold;
+        }
+        .named-element {
+            font-weight: bold;
+            background-color: #343a40;
+        }
+        .left-column {
+            padding-left: 15px;
+            border-left: 0px solid #4cff00;
+            border-right: 1px solid #4cff00;
+        }
+        .other-column {
+            padding-left: 5px;
+            border-right: 1px solid #4cff00;
+            border-left: 0px;
+        }
+        .first-row {
+            border: 1px solid #4cff00;
+            border-right: 0px;
+            border-bottom: 0px;
+        }
+        .other-row {
+            border: 1px solid #4cff00;
+            border-bottom: 0px;
+            border-right: 0px;
+        }
+        .last-row {
+            border: 1px solid #4cff00;
+            border-right: 0px;
+        }
+        .step-element {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+        body {
+            padding: 25px;
+            background-color: black;
+            color: #4cff00;
+        }
+        .risk-very-high {
+            color: rgba(255, 0, 0);
+        }
+
+        .risk-high {
+            color: rgba(255, 165, 0);
+        }
+
+        .risk-moderate {
+            color: rgba(255, 255, 0);
+        }
+
+        .risk-low {
+            color: rgba(76, 255, 0);
+        }
+
+        .risk-very-low {
+            color: rgba(0, 255, 255);
+        }
+    </style>
+</head>
+<body>
+    <button onclick="history.back();" class="btn-neon-green">BACK</button>
+    <span style="padding-left:10px;padding-right:10px;"></span>
+    <button onclick="window.print();" class="btn-neon-yellow">PRINT</button>
+    <center>
+        <h1 class="report-title">@ViewBag.Assessment.Name</h1>
+    </center>
+    @{
+        int scenarioCounter = 1;
+        foreach (Scenarios scenario in ViewBag.Scenarios)
+        {
+            <div class="row first-row">
+                <div class="col-12 left-column"><h4><span class="scenario-label">Scenario @scenarioCounter</span> : @scenario.Name</h4></div>
+            </div>
+            int stepCounter = 1;
+            foreach (Steps step in ViewBag.Steps[scenario.Id])
+            {
+            <div class="step">
+                <div class="row other-row">
+                    <div class="col-3 named-element left-column step-element">THREAT EVENT @scenarioCounter.@stepCounter</div>
+                    <div class="col-5 other-column">@step.Event</div>
+                    <div class="col-2 other-column named-element">RISK</div>
+                    @{
+                        string riskClass = "risk-very-low";
+                        if (step.Risk == "Very High") { riskClass = "risk-very-high"; }
+                        else if (step.Risk == "High") { riskClass = "risk-high"; }
+                        else if (step.Risk == "Moderate") { riskClass = "risk-moderate"; }
+                        else if (step.Risk == "Low") { riskClass = "risk-low"; }
+                    }
+                    <div class="col-2 other-column @riskClass">@step.Risk</div>
+                </div>
+                <div class="row other-row">
+                    <div class="col-2 named-element left-column">INITIATION LIKELIHOOD</div>
+                    <div class="col-1 other-column">@step.Initiation</div>
+                    <div class="col-2 other-column named-element">ADVERSE IMPACT LIKELIHOOD</div>
+                    <div class="col-1 other-column">@step.Adverse</div>
+                    <div class="col-2 other-column named-element">OVERALL LIKELIHOOD</div>
+                    <div class="col-1 other-column">@step.Likelihood</div>
+                    <div class="col-2 other-column named-element">LEVEL OF IMPACT</div>
+                    <div class="col-1 other-column">@step.Impact</div>
+                </div>
+                <div class="row other-row">
+                    @{ 
+                        string tech = step.MitreId;
+                        string col = "MITRE ATT&CK";
+                        if (tech.StartsWith("ics-")) {
+                            tech = tech.Substring(4);
+                            col = "MITRE ATT&CK ICS";
+                        }
+                    }
+                    <div class="col-2 named-element left-column">@col</div>
+                    <div class="col-1 other-column">@tech</div>
+                    <div class="col-2 other-column named-element">THREAT SOURCE</div>
+                    <div class="col-1 other-column">@step.ThreatSource</div>
+                    <div class="col-2 other-column named-element">RELEVANCE</div>
+                    <div class="col-2 other-column">@step.Relevance</div>
+                    <div class="col-1 other-column named-element">C:I:T</div>
+                    <div class="col-1 other-column">@step.Capability:@step.Intent:@step.Targeting</div>
+                </div>
+                <div class="row other-row">
+                    <div class="col-2 named-element left-column">VULNERABILITY</div>
+                    <div class="col-4 other-column">@step.Vulnerability</div>
+                    <div class="col-2 named-element other-column">PREDISPOSING CONDITIONS</div>
+                    <div class="col-4 other-column">@step.Condition</div>
+                </div>
+                <div class="row other-row last-row">
+                    <div class="col-2 named-element left-column">MITIGATION</div>
+                    <div class="col-4 other-column">@step.Mitigation</div>
+                    <div class="col-3 named-element other-column">SEVERITY AND PERVASIVENESS</div>
+                    <div class="col-3 other-column">@step.Severity</div>
+                </div>
+            </div>
+                stepCounter++;
+            }
+            scenarioCounter++;
+        }
+        }
+</body>
+</html>

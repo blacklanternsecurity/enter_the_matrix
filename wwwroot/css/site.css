@@ -1,0 +1,352 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+html {
+    background-color: #000;
+    color: #fff;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+}
+
+header {
+    background-color: #000;
+    color: #fff;
+}
+
+nav.navbar {
+    background-color: #000;
+    color: #fff;
+}
+
+div.container {
+    background-color: #000;
+    color: #fff;
+}
+
+div.factor-container {
+    background-color: rgb(38, 38, 38);
+    padding: 10px;
+    border-radius: 20px;
+
+}
+
+#overflowSlider::-webkit-scrollbar {
+    width: 11px;
+}
+
+#overflowSlider {
+    scrollbar-color: #4cff00 #000000;
+    scrollbar-width: thin;
+}
+
+#overflowSlider::-webkit-scrollbar-track {
+    background: #000000;
+}
+
+#overflowSlider::-webkit-scrollbar-thumb {
+    background-color: #4cff00;
+    border-radius: 5px;
+    border: 3px solid #000000;
+}
+
+#scrollBtn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: #4cff00;
+    color: black;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+#scrollBtn:hover {
+    background-color: #31a400;
+}
+
+a.etm-logo, a, a:hover {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+  color: #4cff00;
+  margin-right: 2vw;
+}
+
+a.event, a.scenario, a.assessment {
+    text-decoration-line: none;
+    margin-right: 0px;
+    word-break: normal;
+}
+
+span.event {
+    color: #4cff00;
+    display: inline-block;
+    max-width: 500px;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+span.risk-very-low, span.risk-low, span.risk-mod, span.risk-high, span.risk-very-high {
+    padding: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-family: 'Courier';
+    border-width: 2px;
+    border-style: solid;
+    display: inline-block;
+    width: 110px;
+}
+
+span.risk-very-low {
+    border-color: aqua;
+    color: aqua;
+}
+
+span.risk-low {
+    border-color: #4cff00;
+    color: #4cff00;
+}
+
+span.risk-mod {
+    border-color: yellow;
+    color: yellow;
+}
+
+span.risk-high {
+    border-color: orange;
+    color: orange;
+}
+
+span.risk-very-high {
+    border-color: red;
+    color: red;
+}
+
+div.ticks {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 6px;
+}
+
+p.ticks {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    width: 3px;
+    background: #4cff00;
+    height: 10px;
+    line-height: 40px;
+    margin: 0 0 15px 0;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+input[type=range].custom-range {
+    width: 100%;
+    margin: 7.55px 0;
+    background-color: transparent;
+    -webkit-appearance: none;
+}
+
+    input[type=range].custom-range:focus {
+        outline: none;
+    }
+
+    input[type=range].custom-range::-webkit-slider-runnable-track {
+        background: #7d7d7d;
+        border: 0.4px solid #010101;
+        border-radius: 17.7px;
+        width: 100%;
+        height: 6.9px;
+        cursor: pointer;
+    }
+
+    input[type=range].custom-range::-webkit-slider-thumb {
+        margin-top: -7.95px;
+        width: 12px;
+        height: 22px;
+        background: #00ff00;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        cursor: pointer;
+        -webkit-appearance: none;
+    }
+
+    input[type=range].custom-range:focus::-webkit-slider-runnable-track {
+        background: #878787;
+    }
+
+    input[type=range].custom-range::-moz-range-track {
+        background: #7d7d7d;
+        border: 0.4px solid #010101;
+        border-radius: 17.7px;
+        width: 100%;
+        height: 6.9px;
+        cursor: pointer;
+    }
+
+    input[type=range].custom-range::-moz-range-thumb {
+        width: 12px;
+        height: 22px;
+        background: #00ff00;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    input[type=range].custom-range::-ms-track {
+        background: transparent;
+        border-color: transparent;
+        border-width: 22.55px 0;
+        color: transparent;
+        width: 100%;
+        height: 6.9px;
+        cursor: pointer;
+    }
+
+    input[type=range].custom-range::-ms-fill-lower {
+        background: #737373;
+        border: 0.4px solid #010101;
+        border-radius: 35.4px;
+    }
+
+    input[type=range].custom-range::-ms-fill-upper {
+        background: #7d7d7d;
+        border: 0.4px solid #010101;
+        border-radius: 35.4px;
+    }
+
+    input[type=range].custom-range::-ms-thumb {
+        width: 12px;
+        height: 22px;
+        background: #00ff00;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 0px;
+        /*Needed to keep the Edge thumb centred*/
+    }
+
+    .form-check-inline {
+        margin-left: 15px;
+    }
+
+    .form-control-success:focus {
+        border-color: #4cff00;
+        box-shadow: 0 0 0 0.2rem rgba(76, 255, 0, 0.25);
+    }
+
+    .form-control-warning:focus {
+        border-color: #ffff33;
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 51, 0.25);
+    }
+
+    .form-control-info:focus {
+        border-color: #37ddfd;
+        box-shadow: 0 0 0 0.2rem rgba(55, 221, 253, 0.25);
+    }
+
+    .custom-file-input-warning:focus ~ .custom-file-label-warning {
+        border-color: #ffff33;
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 51, 0.25);
+    }
+
+    .custom-file-label-warning::after {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    input[type=range].custom-range:focus::-ms-fill-lower {
+        background: #7d7d7d;
+    }
+
+    input[type=range].custom-range:focus::-ms-fill-upper {
+        background: #878787;
+    }
+/*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+how to remove the virtical space around the range input in IE*/
+@supports (-ms-ime-align:auto) {
+    /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+    input[type=range].custom-range {
+        margin: 0;
+        /*Edge starts the margin from the thumb, not the track as other browsers do*/
+    }
+}
+
+
+/* Provide sufficient contrast against white background */
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px; /* Vertically center the text there */
+}
+
+.modal-footer {
+    border: none;
+}
+
+.modal-content {
+    background-color: rgba(0,0,0,0.75);
+}
