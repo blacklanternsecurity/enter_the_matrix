@@ -1,0 +1,105 @@
+﻿<!--
+# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     10-15-2020
+# Copyright:   (c) BLS OPS LLC. 2020
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+-->
+
+@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Enter_The_Matrix</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/typewriter.css" />
+    <link href="~/css/neon-button-green.css" rel="stylesheet" />
+    <link href="~/css/neon-button-red.css" rel="stylesheet" />
+    <link href="~/css/neon-button-yellow.css" rel="stylesheet" />
+    <link href="~/css/neon-dialog.css" rel="stylesheet" />
+    <link href="~/css/modal-animations.css" rel="stylesheet" />
+    <link rel="icon" href="~/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" href="~/favicon-32x32.png" sizes="32x32" />
+    <link rel="shortcut icon" href="~/android-chrome-192x192.png" sizes="192x192" />
+    <link rel="shortcut icon" href="~/android-chrome-512x512.png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="~/apple-touch-icon.png" />
+    <link rel="icon" href="~/favicon.ico" />
+    <link rel="manifest" href="~/manifest.json" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-black mb-3">
+            <div class="container">
+                <a class="etm-logo" asp-area="" asp-controller="Home" asp-action="Index">Enter_The_Matrix</a>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        @{ if (User.Identity.IsAuthenticated)
+                                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Steplates">Templates</a>
+                            </li>
+                                            <li class="nav-itme">
+                                                <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Assessments">Assessments</a>
+                                            </li>
+                                                            <li class="nav-item">
+                                                                <a class="nav-link text-light" asp-area="" asp-controller="AdminDashboard" asp-action="AdminDashboard">Admin</a>
+                                                            </li>
+                                                                            <li class="nav-item">
+                                                                                <a class="nav-link text-light" asp-area="" asp-controller="Security" asp-action="Logout">Logout</a>
+                                                                            </li> }
+                                                                                        else
+                                                                                        {
+                                                                            <li class="nav-item">
+                                                                                <a class="nav-link text-light" asp-area="" asp-controller="AdminDashboard" asp-action="AdminDashboard">Admin</a>
+                                                                            </li>
+                                                                                            <li class="nav-item">
+                                                                                                <a class="nav-link text-light" asp-area="" asp-controller="Security" asp-action="Login">Login</a>
+                                                                                            </li> } }
+                    </ul>
+                </div>
+                @{ if (User.Identity.IsAuthenticated)
+                                {
+                                    var identity = User.Identity as ClaimsIdentity;
+                                    if (identity != null)
+                                    {
+                                        try
+                                        {
+                                            string user = identity.FindFirst("GivenName").Value + "...";
+                    <div class="typewriter">
+                        <h3>Wake up, @user</h3>
+                    </div> }
+                                        catch (Exception e)
+                                        {
+                                            Console.Error.WriteLine(e);
+                                        }
+                                    }
+                                } }
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
+    <footer>
+        <center>
+            <span style="color: #4cff00;">&copy; BLS OPS LLC. @DateTime.Now.Year</span>
+        </center>
+    </footer>
+</body>
+</html>

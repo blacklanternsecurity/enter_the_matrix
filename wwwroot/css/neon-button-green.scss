@@ -1,0 +1,88 @@
+﻿/* VARS */
+$main-font-size: 10px;
+
+$bg-color: #1A1A1B;
+$green: rgba(0, 255, 0, 1);
+$white: #fcfcfc;
+$green-neon-0: rgba(0, 204, 0, 1);
+$green-neon-1: rgba(0, 204, 0, 0.3);
+$green-neon-2: rgba(0, 255, 0, 0.3);
+$green-neon-3: rgba(0, 204, 0, 0.3);
+$blue: #68939c;
+
+/* MIXINS */
+// Font sizing
+@mixin font-size($sizeValue) {
+    $remValue: $sizeValue;
+    $pxValue: ($sizeValue * 10);
+    font-size: $pxValue + px;
+    line-height: ($sizeValue * 1.5 * 10) + px;
+    font-size: $remValue + rem;
+    line-height: $sizeValue * 1.5 + rem;
+}
+
+@mixin x-rem ($property, $value) {
+    #{$property}: $value * $main-font-size;
+    #{$property}: #{$value}rem;
+}
+
+//    vertical-align: middle;
+//
+@mixin btn($color, $bg: none) {
+    display: inline-block;
+    margin-bottom: 0;
+    touch-action: manipulation;
+    cursor: pointer;
+    background-color: transparent;
+    background-image: $bg;
+    background-repeat: no-repeat;
+    background-position: 18px center;
+    border: 1px solid $green;
+    white-space: nowrap;
+    outline: none;
+    color: $color;
+    @include font-size(1.6);
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 2px;
+    font-weight: 300;
+    width: auto;
+    white-space: pre-wrap;
+
+    @if $bg == none {
+        padding: 10px 1.8em;
+    }
+    @else {
+        padding: 10px 18px 10px 50px;
+    }
+
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0;
+
+    @media (min-width: 480px) {
+        width: auto;
+    }
+
+
+    &:hover {
+        animation: intermittente 0.01s infinite alternate;
+        box-shadow: 0px 0px 35px $green-neon-1, 0 0 11px $green-neon-1, 0 0 2px $green-neon-2, 0 0 1px $green-neon-3, 0 0px 17px $green-neon-1, inset 0px 0 17px $green-neon-3, inset 0px 0 30px $green-neon-3;
+    }
+}
+
+/* ANIMATIONS */
+@keyframes intermittente {
+    75% {
+        opacity: 0.7;
+    }
+}
+
+.btn-neon-green {
+    @include btn($green);
+    font-family: 'courier', sans-serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%,-50%,0);
+}

@@ -1,0 +1,77 @@
+﻿@media print {
+    @page {
+        margin: 0;
+        margin-top: 10px;
+        size: A4 landscape;
+    }
+    
+    .step {
+        break-inside: avoid;
+    }
+    
+    .btn-neon-green, .btn-neon-yellow {
+        display: none;
+    }
+
+    .named-element {
+        font-weight: bold;
+        background-color: rgb(180 180 180);
+    }
+
+    .risk-very-high {
+        background-color: rgba(255, 0, 0, 0.5);
+    }
+    .risk-high {
+        background-color: rgba(255, 165, 0, 0.5);
+    }
+    .risk-moderate {
+        background-color: rgba(255, 255, 0, 0.5);
+    }
+    .risk-low {
+        background-color: rgba(76, 255, 0, 0.5);
+    }
+    .risk-very-low {
+        background-color: rgba(0, 255, 255, 0.5);
+    }
+
+    .left-column {
+        padding-left: 15px;
+        border-left: 0px solid black;
+        border-right: 1px solid black;
+    }
+
+    .other-column {
+        padding-left: 5px;
+        border-right: 1px solid black;
+        border-left: 0px;
+    }
+
+    .first-row {
+        border: 1px solid black;
+        border-right: 0px;
+        border-bottom: 0px;
+    }
+
+    .other-row {
+        border: 1px solid black;
+        border-bottom: 0px;
+        border-right: 0px;
+    }
+
+    .last-row {
+        border: 1px solid black;
+        border-right: 0px;
+    }
+
+    .step-element {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    body {
+        padding: 25px;
+        background-color: white;
+        color: black;
+    }
+}

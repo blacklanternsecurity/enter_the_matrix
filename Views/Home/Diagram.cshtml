@@ -1,0 +1,32 @@
+﻿<!--
+# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     10-15-2020
+# Copyright:   (c) BLS OPS LLC. 2020
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+-->
+
+@model List<Steps>
+@{ Layout = null;
+                ViewData["Title"] = "Graph"; }
+<center>
+    <img src="~/graphs/Graph.png" />
+</center>
+
+<br />
+<br />
+
+<h2>Markdown Export</h2>
+<pre>| Event |</pre>
+<pre>| ----- |</pre>
+@{ int i = 1;
+                foreach (var step in Model)
+                {
+                    string body = "| " + i.ToString() + ". " + step.Event + " |";
+    <pre>@body</pre> i++;
+                } }
+    </pre>
+
+<button onclick="window.history.back();">BACK</button>

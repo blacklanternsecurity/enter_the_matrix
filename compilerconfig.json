@@ -1,0 +1,26 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/neon-button.css",
+    "inputFile": "wwwroot/css/neon-button.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/neon-button-green.css",
+    "inputFile": "wwwroot/css/neon-button-green.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/neon-button-red.css",
+    "inputFile": "wwwroot/css/neon-button-red.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/neon-button-yellow.css",
+    "inputFile": "wwwroot/css/neon-button-yellow.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/neon-dialog.css",
+    "inputFile": "wwwroot/css/neon-dialog.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/modal-animations.css",
+    "inputFile": "wwwroot/css/modal-animations.scss"
+  }
+]

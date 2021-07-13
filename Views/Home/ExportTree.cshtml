@@ -1,0 +1,27 @@
+﻿<!--
+# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     06-02-2021
+# Copyright:   (c) BLS OPS LLC. 2021
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+-->
+
+
+@{ Layout = null;
+    ViewData["Title"] = "Threat Tree"; }
+
+<html>
+    <head>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </head>
+    <body>
+        <img style="max-width:85vw; max-height:max-content;" src="~/graphs/Tree.png" />
+        <img style="max-width:15vw; max-height:max-content;" src="~/graphs/Legend.png" />
+        <br/><br/>
+        <button onclick="window.history.back();">BACK</button>
+    </body>
+</html>

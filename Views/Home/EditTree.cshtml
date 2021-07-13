@@ -1,0 +1,1247 @@
+﻿@model ThreatTree;
+@{ ViewData["Title"] = "Threat Tree";}
+
+<form asp-action="EditTree" asp-controller="Home" method="post">
+    <div>
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="btn-neon-yellow" id="return-scenario-btn" onclick="location.href='/Home/Scenarios?assessmentId=@ViewBag.assessmentId'">BACK</button>
+            <button type="submit" class="btn-neon-green" id="save-tree-btn">SAVE</button>
+            <button type="button" class="btn-neon-green" onclick="location.href='/Home/ExportTree?treeId=@Model.Id'" id="export-tree-btn">EXPORT</button>
+            <button type="button" class="btn-neon-red" data-target="#deleteModal" data-toggle="modal" id="delete-tree-btn">DELETE</button>
+        </div>
+    </div>
+    <input type="hidden" name="assessmentId" value="@ViewBag.assessmentId" />
+    <input type="hidden" name="threatTreeId" value="@Model.Id" />
+    <div class="dialog-box_success" data-title="Graph Settings">
+        <div class="form-group factor-container">
+            <div class="row">
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="edgeWidth">Edge Width</label>
+                    @{
+                        if (Model.EdgeWidth != 0.0)
+                        {
+                            <input style="margin-left:15px;" type="text" class="form-control-sm form-control-success bg-dark text-light" name="edgeWidth" value="@Model.EdgeWidth" />
+                        }
+                        else
+                        {
+                            <input style="margin-left:15px;" type="text" class="form-control-sm form-control-success bg-dark text-light" name="edgeWidth" value="1.0" />
+                        }
+                    }
+
+                </div>
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="edgeType">Edge Type</label>
+                    <svg data-toggle="modal" data-target="#edgeTypeInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                        <circle cx="8" cy="4.5" r="1" />
+                    </svg>
+                    <select style="margin-left:15px;" class="form-control-success form-control-sm bg-dark text-light" name="edgeType">
+                        @{
+                            foreach (var type in Model.EdgeTypeList)
+                            {
+                                if (Model.EdgeType != null && Model.EdgeType == type.Key)
+                                {
+                                    <option selected value="@type.Key">@type.Value</option>
+                                }
+                                else
+                                {
+                                    <option value="@type.Key">@type.Value</option>
+                                }
+
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="isRanked">Make graph ranked?</label>
+                    <svg data-toggle="modal" data-target="#rankedInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                        <circle cx="8" cy="4.5" r="1" />
+                    </svg>
+                    @{
+                        if (Model.IsRanked)
+                        {
+                            <input id="isRanked" class="form-check-inline" type="checkbox" value="true" name="isRanked" checked />
+                        }
+                        else
+                        {
+                            <input id="isRanked" class="form-check-inline" type="checkbox" value="true" name="isRanked" />
+                        }
+                    }
+                </div>
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="isClustered">Make graph clustered?</label>
+                    <svg data-toggle="modal" data-target="#clusteredInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                        <circle cx="8" cy="4.5" r="1" />
+                    </svg>
+                    @{
+                        if (Model.IsClustered)
+                        {
+                            <input id="isClustered" class="form-check-inline" type="checkbox" value="true" name="isClustered" checked />
+                        }
+                        else
+                        {
+                            <input id="isClustered" class="form-check-inline" type="checkbox" value="true" name="isClustered" />
+                        }
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="isMerged">Merge common edges?</label>
+                    <svg data-toggle="modal" data-target="#mergeEdgesInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                        <circle cx="8" cy="4.5" r="1" />
+                    </svg>
+                    @{
+                        if (Model.IsMerged)
+                        {
+                            <input id="isMerged" onchange="toggleMergeNode()" class="form-check-inline" type="checkbox" value="true" name="isMerged" checked />
+                        }
+                        else
+                        {
+                            <input id="isMerged" onchange="toggleMergeNode()" class="form-check-inline" type="checkbox" value="true" name="isMerged" />
+                        }
+                    }
+                </div>
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="isDigraph">Make graph directed?</label>
+                    <svg data-toggle="modal" data-target="#directedInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                        <circle cx="8" cy="4.5" r="1" />
+                    </svg>
+                    @{
+                        if (Model.IsDigraph)
+                        {
+                            <input id="isDigraph" onchange="toggleDirected()" class="form-check-inline" type="checkbox" value="true" name="isDigraph" checked />
+                        }
+                        else
+                        {
+                            <input id="isDigraph" onchange="toggleDirected()" class="form-check-inline" type="checkbox" value="true" name="isDigraph" />
+                        }
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" style="margin-bottom:10px;">
+                    @{
+                        string textDecoration = "";
+                        string amIDisabled = "";
+                        if (!Model.IsMerged)
+                        {
+                            textDecoration = "style=text-decoration:line-through;";
+                            amIDisabled = "disabled";
+                        }
+
+                    }
+                    <label @textDecoration id="mergeEdgeTypeLabel" for="mergeEdgeType">Merged Edge Type</label>
+                    <svg data-toggle="modal" data-target="#mergedEdgeTypeInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                        <circle cx="8" cy="4.5" r="1" />
+                    </svg>
+                    <select @amIDisabled name="mergeEdgeType" id="mergeEdgeType" style="margin-left:15px;" class="form-control-sm form-control-success bg-dark text-light">
+                        @{
+                            foreach (var type in Model.MergeEdgeTypeList)
+                            {
+                                if (Model.MergeEdgeType != null && Model.MergeEdgeType == type.Key)
+                                {
+                                    <option selected value="@type.Key">@type.Value</option>
+                                }
+                                else
+                                {
+                                    <option value="@type.Key">@type.Value</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label @textDecoration id="isMergeNodeLabel" for="isMergeNode">Show merge points?</label>
+                    <svg data-toggle="modal" data-target="#mergePointsInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                        <circle cx="8" cy="4.5" r="1" />
+                    </svg>
+                    @{
+                        if (Model.IsMergeNode)
+                        {
+                            <input @amIDisabled id="isMergeNode" class="form-check-inline" type="checkbox" value="true" name="isMergeNode" checked />
+                        }
+                        else
+                        {
+                            <input @amIDisabled id="isMergeNode" class="form-check-inline" type="checkbox" value="true" name="isMergeNode" />
+                        }
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" style="margin-bottom:10px;">
+                    @{
+                        textDecoration = "";
+                        amIDisabled = "";
+                        if (!Model.IsDigraph)
+                        {
+                            textDecoration = "style=text-decoration:line-through;";
+                            amIDisabled = "disabled";
+                        }
+                    }
+                    <label @textDecoration id="arrowTypeLabel" for="arrowType">Arrow Type</label>
+                    <select @amIDisabled name="arrowType" id="arrowType" class="form-control-sm form-control-success bg-dark text-light" style="margin-left:15px;">
+                        @foreach (var type in Model.ArrowTypeList)
+                        {
+                            if (Model.ArrowType != null && Model.ArrowType == type.Key)
+                            {
+                                <option selected value="@type.Key">@type.Value</option>
+                            }
+                            else
+                            {
+                                <option value="@type.Key">@type.Value</option>
+                            }
+
+                        }
+                        }
+                    </select>
+                </div>
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="graphDirection">Graph Direction</label>
+                    <select name="graphDirection" id="graphDirection" class="form-control-sm form-control-success bg-dark text-light" style="margin-left:15px;">
+                        @{
+                            foreach (var dir in Model.GraphDirectionList)
+                            {
+                                if (Model.GraphDirection != null && Model.GraphDirection == dir.Key)
+                                {
+                                    <option selected value="@dir.Key">@dir.Value</option>
+                                }
+                                else
+                                {
+                                    <option value="@dir.Key">@dir.Value</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="graphWidth">Graph Width</label>
+                    @{
+                        if (Model.GraphWidth == 0)
+                        {
+                            <input type="text" name="graphWidth" class="form-control-sm form-control-success bg-dark text-light" style="margin-left:15px;" value="8192" />
+                        }
+                        else
+                        {
+                            <input type="text" name="graphWidth" class="form-control-sm form-control-success bg-dark text-light" style="margin-left:15px;" value="@Model.GraphWidth" />
+                        }
+                    }
+                </div>
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="graphHeight">Graph Height</label>
+                    @{
+                        if (Model.GraphHeight == 0)
+                        {
+                            <input type="text" name="graphHeight" class="form-control-sm form-control-success bg-dark text-light" style="margin-left:15px;" value="8192" />
+                        }
+                        else
+                        {
+                            <input type="text" name="graphHeight" class="form-control-sm form-control-success bg-dark text-light" style="margin-left:15px;" value="@Model.GraphHeight" />
+                        }
+                    }
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="fontFace">Font</label>
+                    <select name="fontFace" id="fontFace" class="form-control-sm form-control-success bg-dark text-light" style="margin-left:15px;">
+                        @{
+                            foreach (var font in Model.FontFaceList)
+                            {
+                                if (Model.FontFace != null && Model.FontFace == font)
+                                {
+                                    <option selected value="@font">@font</option>
+                                }
+                                else
+                                {
+                                    <option value="@font">@font</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-6" style="margin-bottom:10px;">
+                    <label for="fontColor">Font Color</label>
+                    @{
+                        string backgroundColor = Model.ColorList.First().Value;
+                        if (Model.FontColor != null) { backgroundColor = Model.ColorList[Model.FontColor]; }
+                    }
+                    <select onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor" name="fontColor" id="fontColor" class="form-control-sm form-control-success" style="margin-left:15px;background-color:@backgroundColor;">
+                        @{
+                            foreach (var color in Model.ColorList)
+                            {
+                                if (Model.FontColor != null && Model.FontColor == color.Key)
+                                {
+                                    <option selected value="@color.Key" style="background-color:@color.Value;">@color.Key</option>
+                                }
+                                else
+                                {
+                                    <option value="@color.Key" style="background-color:@color.Value;">@color.Key</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    @{
+
+        List<string> ActiveNodes = new List<string>();
+        if (Model.NodeList != null) { foreach (var node in Model.NodeList) { ActiveNodes.Add(node.AttackId); } }
+        foreach (var step in ViewBag.stepCollection)
+        {
+            ThreatTreeNode thisNode = new ThreatTreeNode();
+            bool matched = false;
+            bool hasNodes = false; // If this is the first time a tree is being edited, we want to display defaults where all nodes are enabled
+                                   // If this is the first time a tree is being edited, it should have a null NodeList
+            if (Model.NodeList != null)
+            {
+                hasNodes = true;
+                foreach (ThreatTreeNode node in Model.NodeList)
+                {
+                    if (node.AttackId == step.MitreId)
+                    {
+                        thisNode = node;
+                        matched = true;
+                        break;
+                    }
+                }
+            }
+
+            <div class="dialog-box_info" data-title="Node Settings">
+                <div class="form-group factor-container">
+                    <div class="row">
+                        <div class="col-12" style="margin-bottom:10px;">
+                            <center><span>@step.MitreId - @ViewBag.techniques[step.MitreId]</span></center><hr />
+                            <input type="hidden" value="@ViewBag.techniques[step.MitreId]" name="attackDescription" id="attackDescription-@step.MitreId" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6" style="margin-bottom:10px;">
+                            <label id="nodeEnabled-@step.MitreId-Label" for="nodeEnabled-@step.MitreId">Enable In Graph?</label>
+                            @{
+                                if (matched)
+                                {
+                                    <input type="checkbox" checked onchange="toggleNode('@step.MitreId')" class="form-check-inline" name="attackId" id="nodeEnabled-@step.MitreId" value="@step.MitreId" />
+                                }
+                                else if (hasNodes)
+                                {
+                                    <input type="checkbox" onchange="toggleNode('@step.MitreId')" class="form-check-inline" name="attackId" id="nodeEnabled-@step.MitreId" value="@step.MitreId" />
+                                }
+                                else
+                                {
+                                    <input type="checkbox" checked onchange="toggleNode('@step.MitreId')" class="form-check-inline" name="attackId" id="nodeEnabled-@step.MitreId" value="@step.MitreId" />
+                                }
+                            }
+                        </div>
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched) // If matched, then this is an existing tree that was set to include this node, so we'll use its set values
+                                {
+                                    <label id="nodeCategory-@step.MitreId-Label" class="@step.MitreId-Label" for="nodeCategory-@step.MitreId">Category</label>
+                                    backgroundColor = Model.Categories.First()[2];
+                                    if (thisNode.Classification[2] != null && thisNode.Classification[2] != "") { backgroundColor = thisNode.Classification[2]; }
+                                    <select class="form-control-sm form-control-info @step.MitreId-Input" name="classification" id="nodeCategory-@step.MitreId" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor" style="background-color:@backgroundColor;margin-left:15px;">
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            if (thisNode.Classification[0] == category[0])
+                                            {
+                                                <option selected value="@category[0]|@category[1]|@category[2]" style="background-color:@category[2];">@category[0]</option>
+
+                                            }
+                                            else
+                                            {
+                                                <option value="@category[0]|@category[1]|@category[2]" style="background-color:@category[2];">@category[0]</option>
+                                            }
+                                        }
+                                    </select>
+                                }
+                                else if (hasNodes) // not matched but tree has nodes, so this node input should be disabled and the label should have a strike through
+                                {
+                                    <label style="text-decoration:line-through;" id="nodeCategory-@step.MitreId-Label" class="@step.MitreId-Label" for="nodeCategory-@step.MitreId">Category</label>
+                                    <select disabled class="form-control-sm form-control-info @step.MitreId-Input" name="classification" id="nodeCategory-@step.MitreId" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor" style="background-color:@Model.Categories.First()[2];margin-left:15px;">
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            <option value="@category[0]|@category[1]|@category[2]" style="background-color:@category[2];">@category[0]</option>
+                                        }
+                                    </select>
+                                }
+                                else // in this case we have a new tree with no nodes so we want our default on create settings
+                                {
+                                    <label id="nodeCategory-@step.MitreId-Label" class="@step.MitreId-Label" for="nodeCategory-@step.MitreId">Category</label>
+                                    <select class="form-control-sm form-control-info @step.MitreId-Input" name="classification" id="nodeCategory-@step.MitreId" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor" style="background-color:@Model.Categories.First()[2];margin-left:15px;">
+                                        @foreach (var category in Model.Categories)
+                                        {
+                                            <option value="@category[0]|@category[1]|@category[2]" style="background-color:@category[2];">@category[0]</option>
+                                        }
+                                    </select>
+                                }
+                            }
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="customDescription-@step.MitreId" class="@step.MitreId-Label" id="customDescription-@step.MitreId-Label">Custom Title</label>
+                                    <input name="customDescription" type="text" id="customDescription-@step.MitreId" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;width:70%;" value="@thisNode.CustomDescription" />
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="customDescription-@step.MitreId" class="@step.MitreId-Label" id="customDescription-@step.MitreId-Label">Custom Title</label>
+                                    <input disabled name="customDescription" type="text" id="customDescription-@step.MitreId" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;width:70%;" />
+                                }
+                                else
+                                {
+                                    <label for="customDescription-@step.MitreId" class="@step.MitreId-Label" id="customDescription-@step.MitreId-Label">Custom Title</label>
+                                    <input name="customDescription" type="text" id="customDescription-@step.MitreId" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;width:70%;" />
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="displayStyle-@step.MitreId" class="@step.MitreId-Label" id="displayStyle-@step.MitreId-Label">Title Style</label>
+                                    <svg data-toggle="modal" data-target="#titleStyleInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                        <circle cx="8" cy="4.5" r="1" />
+                                    </svg>
+                                    <select id="displayStyle-@step.MitreId" name="displayStyle" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;">
+                                        @{
+                                            foreach (var style in ViewBag.threatTreeNodeTemplate.DisplayStyleList)
+                                            {
+                                                if (thisNode.DisplayStyle == style.Key)
+                                                {
+                                                    <option selected value="@style.Key">@style.Value</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@style.Key">@style.Value</option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="displayStyle-@step.MitreId" class="@step.MitreId-Label" id="displayStyle-@step.MitreId-Label">Title Style</label>
+                                    <svg data-toggle="modal" data-target="#titleStyleInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                        <circle cx="8" cy="4.5" r="1" />
+                                    </svg>
+                                    <select disabled id="displayStyle-@step.MitreId" name="displayStyle" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;">
+                                        @{
+                                            foreach (var style in ViewBag.threatTreeNodeTemplate.DisplayStyleList)
+                                            {
+                                                <option value="@style.Key">@style.Value</option>
+                                            }
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    <label for="displayStyle-@step.MitreId" class="@step.MitreId-Label" id="displayStyle-@step.MitreId-Label">Title Style</label>
+                                    <svg data-toggle="modal" data-target="#titleStyleInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                        <circle cx="8" cy="4.5" r="1" />
+                                    </svg>
+                                    <select id="displayStyle-@step.MitreId" name="displayStyle" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;">
+                                        @{
+                                            foreach (var style in ViewBag.threatTreeNodeTemplate.DisplayStyleList)
+                                            {
+                                                <option value="@style.Key">@style.Value</option>
+                                            }
+                                        }
+                                    </select>
+                                }
+                            }
+                        </div>
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="displayMitreId-@step.MitreId" class="@step.MitreId-Label" id="displayMitreId-@step.MitreId-Label">Display MITRE ID?</label>
+                                    if (thisNode.DisplayMitreId)
+                                    {
+                                        <input id="displayMitreId-@step.MitreId" type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" onchange="document.getElementById('displayMitreId-@step.MitreId-hidden').value=this.checked" checked />
+                                        <input type="hidden" id="displayMitreId-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="displayMitreId" />
+                                    }
+                                    else
+                                    {
+                                        <input id="displayMitreId-@step.MitreId" type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" onchange="document.getElementById('displayMitreId-@step.MitreId-hidden').value=this.checked" />
+                                        <input type="hidden" id="displayMitreId-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="displayMitreId" />
+                                    }
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="displayMitreId-@step.MitreId" class="@step.MitreId-Label" id="displayMitreId-@step.MitreId-Label">Display MITRE ID?</label>
+                                    <input disalbed id="displayMitreId-@step.MitreId" type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" onchange="document.getElementById('displayMitreId-@step.MitreId-hidden').value=this.checked" checked />
+                                    <input disabled type="hidden" id="displayMitreId-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="displayMitreId" />
+                                }
+                                else
+                                {
+                                    <label for="displayMitreId-@step.MitreId" class="@step.MitreId-Label" id="displayMitreId-@step.MitreId-Label">Display MITRE ID?</label>
+                                    <input id="displayMitreId-@step.MitreId" type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" onchange="document.getElementById('displayMitreId-@step.MitreId-hidden').value=this.checked" checked />
+                                    <input type="hidden" id="displayMitreId-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="displayMitreId" />
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="nodeFilled-@step.MitreId" class="@step.MitreId-Label" id="nodeFilled-@step.MitreId-Label">Fill the Node?</label>
+                                    if (thisNode.IsNodeFilled)
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="nodeFilled-@step.MitreId" onchange="document.getElementById('nodeFilled-@step.MitreId-hidden').value=this.checked" checked />
+                                        <input type="hidden" id="nodeFilled-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isNodeFilled" />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="nodeFilled-@step.MitreId" onchange="document.getElementById('nodeFilled-@step.MitreId-hidden').value=this.checked" />
+                                        <input type="hidden" id="nodeFilled-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isNodeFilled" />
+                                    }
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="nodeFilled-@step.MitreId" class="@step.MitreId-Label" id="nodeFilled-@step.MitreId-Label">Fill the Node?</label>
+                                    <input disabled type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="nodeFilled-@step.MitreId" onchange="document.getElementById('nodeFilled-@step.MitreId-hidden').value=this.checked" checked />
+                                    <input disabled type="hidden" id="nodeFilled-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isNodeFilled" />
+                                }
+                                else
+                                {
+                                    <label for="nodeFilled-@step.MitreId" class="@step.MitreId-Label" id="nodeFilled-@step.MitreId-Label">Fill the Node?</label>
+                                    <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="nodeFilled-@step.MitreId" onchange="document.getElementById('nodeFilled-@step.MitreId-hidden').value=this.checked" checked />
+                                    <input type="hidden" id="nodeFilled-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isNodeFilled" />
+                                }
+                            }
+                        </div>
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="addDiagonals-@step.MitreId" class="@step.MitreId-Label" id="addDiagonals-@step.MitreId-Label">Add Diagonals to Border?</label>
+                                    <svg data-toggle="modal" data-target="#diagonalsInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                        <circle cx="8" cy="4.5" r="1" />
+                                    </svg>
+                                    if (thisNode.IsBorderDiagonals)
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="addDiagonals-@step.MitreId" onchange="document.getElementById('addDiagonals-@step.MitreId-hidden').value=this.checked" checked />
+                                        <input type="hidden" id="addDiagonals-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isBorderDiagonals" />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="addDiagonals-@step.MitreId" onchange="document.getElementById('addDiagonals-@step.MitreId-hidden').value=this.checked" />
+                                        <input type="hidden" id="addDiagonals-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isBorderDiagonals" />
+                                    }
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="addDiagonals-@step.MitreId" class="@step.MitreId-Label" id="addDiagonals-@step.MitreId-Label">Add Diagonals to Border?</label>
+                                    <svg data-toggle="modal" data-target="#diagonalsInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                        <circle cx="8" cy="4.5" r="1" />
+                                    </svg>
+                                    <input disabled type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="addDiagonals-@step.MitreId" onchange="document.getElementById('addDiagonals-@step.MitreId-hidden').value=this.checked" />
+                                    <input disabled type="hidden" id="addDiagonals-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isBorderDiagonals" />
+                                }
+                                else
+                                {
+                                    <label for="addDiagonals-@step.MitreId" class="@step.MitreId-Label" id="addDiagonals-@step.MitreId-Label">Add Diagonals to Border?</label>
+                                    <svg data-toggle="modal" data-target="#diagonalsInfoModal" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-info-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
+                                        <path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588z" />
+                                        <circle cx="8" cy="4.5" r="1" />
+                                    </svg>
+                                    <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="addDiagonals-@step.MitreId" onchange="document.getElementById('addDiagonals-@step.MitreId-hidden').value=this.checked" />
+                                    <input type="hidden" id="addDiagonals-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isBorderDiagonals" />
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="borderRounded-@step.MitreId" class="@step.MitreId-Label" id="borderRounded-@step.MitreId-Label">Make Border Rounded?</label>
+                                    if (thisNode.IsBorderRounded)
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderRounded-@step.MitreId" onchange="document.getElementById('borderRounded-@step.MitreId-hidden').value=this.checked" checked />
+                                        <input type="hidden" id="borderRounded-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isBorderRounded" />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderRounded-@step.MitreId" onchange="document.getElementById('borderRounded-@step.MitreId-hidden').value=this.checked" />
+                                        <input type="hidden" id="borderRounded-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isBorderRounded" />
+                                    }
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="borderRounded-@step.MitreId" class="@step.MitreId-Label" id="borderRounded-@step.MitreId-Label">Make Border Rounded?</label>
+                                    <input disabled type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderRounded-@step.MitreId" onchange="document.getElementById('borderRounded-@step.MitreId-hidden').value=this.checked" checked />
+                                    <input disabled type="hidden" id="borderRounded-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isBorderRounded" />
+                                }
+                                else
+                                {
+                                    <label for="borderRounded-@step.MitreId" class="@step.MitreId-Label" id="borderRounded-@step.MitreId-Label">Make Border Rounded?</label>
+                                    <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderRounded-@step.MitreId" onchange="document.getElementById('borderRounded-@step.MitreId-hidden').value=this.checked" checked />
+                                    <input type="hidden" id="borderRounded-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isBorderRounded" />
+                                }
+                            }
+                        </div>
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="borderBold-@step.MitreId" class="@step.MitreId-Label" id="borderBold-@step.MitreId-Label">Make Border Bold?</label>
+                                    if (thisNode.IsBorderBold)
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderBold-@step.MitreId" onchange="document.getElementById('borderBold-@step.MitreId-hidden').value=this.checked" checked />
+                                        <input type="hidden" id="borderBold-@step.MitreId-hidden" class="@step.MitreId-Input" value="true" name="isBorderBold" />
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderBold-@step.MitreId" onchange="document.getElementById('borderBold-@step.MitreId-hidden').value=this.checked" />
+                                        <input type="hidden" id="borderBold-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isBorderBold" />
+                                    }
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="borderBold-@step.MitreId" class="@step.MitreId-Label" id="borderBold-@step.MitreId-Label">Make Border Bold?</label>
+                                    <input disabled type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderBold-@step.MitreId" onchange="document.getElementById('borderBold-@step.MitreId-hidden').value=this.checked" />
+                                    <input disabled type="hidden" id="borderBold-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isBorderBold" />
+                                }
+                                else
+                                {
+                                    <label for="borderBold-@step.MitreId" class="@step.MitreId-Label" id="borderBold-@step.MitreId-Label">Make Border Bold?</label>
+                                    <input type="checkbox" value="true" class="form-check-inline @step.MitreId-Input" id="borderBold-@step.MitreId" onchange="document.getElementById('borderBold-@step.MitreId-hidden').value=this.checked" />
+                                    <input type="hidden" id="borderBold-@step.MitreId-hidden" class="@step.MitreId-Input" value="false" name="isBorderBold" />
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="borderStyle-@step.MitreId" class="@step.MitreId-Label" id="borderStyle-@step.MitreId-Label">Border Style</label>
+                                    <select id="borderStyle-@step.MitreId" name="borderStyle" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;">
+                                        @foreach (var style in ViewBag.threatTreeNodeTemplate.BorderStyleList)
+                                        {
+                                            if (thisNode.BorderStyle == style.Key)
+                                            {
+                                                <option selected value="@style.Key">@style.Value</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@style.Key">@style.Value</option>
+                                            }
+                                        }
+                                    </select>
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="borderStyle-@step.MitreId" class="@step.MitreId-Label" id="borderStyle-@step.MitreId-Label">Border Style</label>
+                                    <select disabled id="borderStyle-@step.MitreId" name="borderStyle" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;">
+                                        @foreach (var style in ViewBag.threatTreeNodeTemplate.BorderStyleList)
+                                        {
+                                            <option value="@style.Key">@style.Value</option>
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    <label for="borderStyle-@step.MitreId" class="@step.MitreId-Label" id="borderStyle-@step.MitreId-Label">Border Style</label>
+                                    <select id="borderStyle-@step.MitreId" name="borderStyle" class="form-control-sm form-control-info bg-dark text-light @step.MitreId-Input" style="margin-left:15px;">
+                                        @foreach (var style in ViewBag.threatTreeNodeTemplate.BorderStyleList)
+                                        {
+                                            <option value="@style.Key">@style.Value</option>
+                                        }
+                                    </select>
+                                }
+                            }
+                        </div>
+                        <div class="col-6" style="margin-bottom:10px;">
+                            @{
+                                if (matched)
+                                {
+                                    <label for="nodeShape-@step.MitreId" class="@step.MitreId-Label" id="nodeShape-@step.MitreId-Label">Node Shape</label>
+                                    <select name="nodeShape" id="nodeShape-@step.MitreId" style="margin-left:15px;" class="form-control-sm form-control-success bg-dark text-light @step.MitreId-Input">
+                                        @foreach (var shape in ViewBag.threatTreeNodeTemplate.NodeShapeList)
+                                        {
+                                            if (thisNode.NodeShape == shape.Key)
+                                            {
+                                                <option selected value="@shape.Key">@shape.Value</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@shape.Key">@shape.Value</option>
+                                            }
+                                        }
+                                    </select>
+                                }
+                                else if (hasNodes)
+                                {
+                                    <label style="text-decoration:line-through;" for="nodeShape-@step.MitreId" class="@step.MitreId-Label" id="nodeShape-@step.MitreId-Label">Node Shape</label>
+                                    <select disabled name="nodeShape" id="nodeShape-@step.MitreId" style="margin-left:15px;" class="form-control-sm form-control-success bg-dark text-light @step.MitreId-Input">
+                                        @foreach (var shape in ViewBag.threatTreeNodeTemplate.NodeShapeList)
+                                        {
+                                            <option value="@shape.Key">@shape.Value</option>
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    <label for="nodeShape-@step.MitreId" class="@step.MitreId-Label" id="nodeShape-@step.MitreId-Label">Node Shape</label>
+                                    <select name="nodeShape" id="nodeShape-@step.MitreId" style="margin-left:15px;" class="form-control-sm form-control-success bg-dark text-light @step.MitreId-Input">
+                                        @foreach (var shape in ViewBag.threatTreeNodeTemplate.NodeShapeList)
+                                        {
+                                            <option value="@shape.Key">@shape.Value</option>
+                                        }
+                                    </select>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group factor-container">
+                    <div class="row">
+                        <div class="col-12">
+                            <center>
+                                @{
+                                    if (matched)
+                                    {
+                                        <span id="occurenceContainer-@step.MitreId-Label" class="@step.MitreId-Label">How did this technique present itself?</span>
+                                        <span style="float: right; cursor:pointer;" onclick="addOccurence('@step.MitreId');" class="material-icons"><a>add_box</a></span>
+                                        <span style="float: right; cursor:pointer;" onclick="removeOccurence('@step.MitreId');" class="material-icons"><a>remove_circle</a></span>
+                                    }
+                                    else if (hasNodes)
+                                    {
+                                        <span style="text-decoration:line-through;" id="occurenceContainer-@step.MitreId-Label" class="@step.MitreId-Label">How did this technique present itself?</span>
+                                        <span style="float: right; cursor:pointer;" onclick="addOccurence('@step.MitreId');" class="material-icons"><a>add_box</a></span>
+                                        <span style="float: right; cursor:pointer;" onclick="removeOccurence('@step.MitreId');" class="material-icons"><a>remove_circle</a></span>
+                                    }
+                                    else
+                                    {
+                                        <span id="occurenceContainer-@step.MitreId-Label" class="@step.MitreId-Label">How did this technique present itself?</span>
+                                        <span style="float: right; cursor:pointer;" onclick="addOccurence('@step.MitreId');" class="material-icons"><a>add_box</a></span>
+                                        <span style="float: right; cursor:pointer;" onclick="removeOccurence('@step.MitreId');" class="material-icons"><a>remove_circle</a></span>
+                                    }
+                                }
+                                <hr />
+                            </center>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" id="occurenceContainer-@step.MitreId">
+                            @{
+                                if (matched)
+                                {
+                                    foreach (var occurence in thisNode.Occurence)
+                                    {
+                                        <input type="text" class="form-control form-control-info bg-dark text-light @step.MitreId-Input" id="occurence-@step.MitreId" name="occurence" style="margin-bottom:10px;" value="@occurence" />
+                                    }
+                                    <input type="hidden" class="@step.MitreId-Input" name="occurence" value="#null" />
+                                }
+                                else if (hasNodes)
+                                {
+                                    <input disabled type="text" class="form-control form-control-info bg-dark text-light @step.MitreId-Input" id="occurence-@step.MitreId" name="occurence" style="margin-bottom:10px;" />
+                                    <input disabled type="hidden" class="@step.MitreId-Input" name="occurence" value="#null" />
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control form-control-info bg-dark text-light @step.MitreId-Input" id="occurence-@step.MitreId" name="occurence" style="margin-bottom:10px;" />
+                                    <input type="hidden" class="@step.MitreId-Input" name="occurence" value="#null" />
+                                }
+                            }
+
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group factor-container">
+                    <div class="row">
+                        <div class="col-12">
+                            <center><span>Which techniques lead to @step.MitreId?</span></center><hr />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" id="parent-group-@step.MitreId">
+                            <center>
+                                @{
+                                    foreach (var step2 in ViewBag.stepCollection)
+                                    {
+                                        if (step2.MitreId != step.MitreId)
+                                        {
+                                            if (matched) // This node is active (not disabled children)
+                                            {
+                                                if (ActiveNodes.Contains(step2.MitreId)) // This parent node is active (not disabled)
+                                                {
+                                                    if (thisNode.ParentId.ToList().Contains(step2.MitreId)) // This node is active, and it has this active parent node
+                                                    {
+                                                        <input name="parentId" class="form-check-inline parent-@step2.MitreId @step2.MitreId-Input @step.MitreId-Input parent-input" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId" id="@step.MitreId-parent-@step2.MitreId" type="checkbox" value="@step2.MitreId" checked /><label class="form-check-label parent-@step2.MitreId-Label @step2.MitreId-Label @step.MitreId-Label parent-label" id="@step.MitreId-parent-@step2.MitreId-Label" for="@step.MitreId-parent-@step2.MitreId" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId">@step2.MitreId - @ViewBag.techniques[step2.MitreId]</label><br />
+                                                    }
+                                                    else // This node is active, the parent node is also active, but it does not belong here
+                                                    {
+                                                        <input name="parentId" class="form-check-inline parent-@step2.MitreId @step2.MitreId-Input @step.MitreId-Input parent-input" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId" id="@step.MitreId-parent-@step2.MitreId" type="checkbox" value="@step2.MitreId" /><label class="form-check-label parent-@step2.MitreId-Label @step2.MitreId-Label @step.MitreId-Label parent-label" id="@step.MitreId-parent-@step2.MitreId-Label" for="@step.MitreId-parent-@step2.MitreId" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId">@step2.MitreId - @ViewBag.techniques[step2.MitreId]</label><br />
+                                                    }
+                                                }
+                                                else // This node is active, but this parent node is not active
+                                                {
+                                                    <input disabled name="parentId" class="form-check-inline parent-@step2.MitreId @step2.MitreId-Input @step.MitreId-Input parent-input" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId" id="@step.MitreId-parent-@step2.MitreId" type="checkbox" value="@step2.MitreId" /><label style="text-decoration:line-through;" class="form-check-label parent-@step2.MitreId-Label @step2.MitreId-Label @step.MitreId-Label parent-label" id="@step.MitreId-parent-@step2.MitreId-Label" for="@step.MitreId-parent-@step2.MitreId" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId">@step2.MitreId - @ViewBag.techniques[step2.MitreId]</label><br />
+                                                }
+                                            }
+                                            else if (hasNodes) // This node is not active, however the graph has nodes, so this is not a new graph
+                                            {
+                                                <input disabled name="parentId" class="form-check-inline parent-@step2.MitreId @step2.MitreId-Input @step.MitreId-Input parent-input" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId" id="@step.MitreId-parent-@step2.MitreId" type="checkbox" value="@step2.MitreId" /><label style="text-decoration:line-through;" class="form-check-label parent-@step2.MitreId-Label @step2.MitreId-Label @step.MitreId-Label parent-label" id="@step.MitreId-parent-@step2.MitreId-Label" for="@step.MitreId-parent-@step2.MitreId" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId">@step2.MitreId - @ViewBag.techniques[step2.MitreId]</label><br />
+                                            }
+                                            else // This node is not active, and the graph does not have any nodes, this is a new graph, display default behavior
+                                            {
+                                                <input name="parentId" class="form-check-inline parent-@step2.MitreId @step2.MitreId-Input @step.MitreId-Input parent-input" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId" id="@step.MitreId-parent-@step2.MitreId" type="checkbox" value="@step2.MitreId" /><label class="form-check-label parent-@step2.MitreId-Label @step2.MitreId-Label @step.MitreId-Label parent-label" id="@step.MitreId-parent-@step2.MitreId-Label" for="@step.MitreId-parent-@step2.MitreId" data-nodeRef="@step2.MitreId" data-thisNode="@step.MitreId">@step2.MitreId - @ViewBag.techniques[step2.MitreId]</label><br />
+                                            }
+                                        }
+                                    }
+                                    if (matched)
+                                    {
+                                        <input name="parentId" class="@step.MitreId-Input" type="hidden" value="#null" />
+                                    }
+                                    else if (hasNodes)
+                                    {
+                                        <input disabled name="parentId" class="@step.MitreId-Input" type="hidden" value="#null" />
+                                    }
+                                    else
+                                    {
+                                        <input name="parentId" class="@step.MitreId-Input" type="hidden" value="#null" />
+                                    }
+                                }
+                            </center>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</form>
+<button class="" onclick="topFunction()" id="scrollBtn" title="Go to top"><span class="material-icons">arrow_upward</span></button>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_error">
+                <center>
+                    <p>Are you sure you want to delete this threat tree?</p>
+                    <p>Changes cannot be undone.</p>
+                </center>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form asp-action="DeleteTree" asp-controller="Home" method="post">
+                    <input name="assessmentId" type="hidden" value="@ViewBag.assessmentId" />
+                    <input name="treeId" type="hidden" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">DELETE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Modals -->
+
+<!-- Edge Type Info Modal -->
+<div class="modal fade" id="edgeTypeInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-4">
+                        Curved:
+                        <img src="~/examples/edgeTypes.curved.png" />
+                    </div>
+                    <div class="col-4">
+                        Orthogonal:
+                        <img src="~/examples/edgeTypes.ortho.png" />
+                    </div>
+                    <div class="col-4">
+                        Polyline:
+                        <img src="~/examples/edgeTypes.poly.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ranked Info Modal -->
+<div class="modal fade" id="rankedInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-6">
+                        Ranked:<br />A and B are ranked together, C and D are ranked together<br />This graphs direction is Left-To-Right<br />In an exported graph, the categories contents are ranked together
+                        <img src="~/examples/ranked.png" />
+                    </div>
+                    <div class="col-6">
+                        Unranked:
+                        <img src="~/examples/unranked.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clustered Info Modal -->
+<div class="modal fade" id="clusteredInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-12">
+                        Clustered:<br />In an exported graph, a categories contents are clustered together
+                        <img src="~/examples/clustered.png" />
+                    </div>
+                </div>
+                <br /><br />
+                <div class="row">
+                    <div class="col-12">
+                        Unclustered:
+                        <img src="~/examples/unclustered.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Merge Edges Info Modal -->
+<div class="modal fade" id="mergeEdgesInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-6">
+                        Merged Edge:<br />
+                        <img src="~/examples/merged.png" />
+                    </div>
+                    <div class="col-6">
+                        Unmerged Edge:<br />
+                        <img src="~/examples/unmerged.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Directed Info Modal -->
+<div class="modal fade" id="directedInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-6">
+                        Directed:<br />
+                        <img src="~/examples/digraph.png" />
+                    </div>
+                    <div class="col-6">
+                        Undirected:<br />
+                        <img src="~/examples/graph.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Merged Edge Type Info Modal -->
+<div class="modal fade" id="mergedEdgeTypeInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-4">
+                        Solid:
+                        <img src="~/examples/mergeEdgeTypes.solid.png" />
+                    </div>
+                    <div class="col-4">
+                        Dashed:
+                        <img src="~/examples/mergeEdgeTypes.dashed.png" />
+                    </div>
+                    <div class="col-4">
+                        Dotted:
+                        <img src="~/examples/mergeEdgeTypes.dotted.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Merge Points Info Modal -->
+<div class="modal fade" id="mergePointsInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-12">
+                        Merge Point:<br />
+                        <img src="~/examples/mergePoint.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Title Style Info Modal -->
+<div class="modal fade" id="titleStyleInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                Each node in the graph will have a title label. You can choose whether or not you want to use the default MITRE ATT&CK Technique description, a custom description you provide, or neither. The title also may contain the MITRE ATT&CK ID if you so choose. Note that it is not possible to have a completely empty node title. Even if you deselect the ID and choose neither for the title style, it will still be populated by a rough default MITRE ID.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Diagonals Info Modal -->
+<div class="modal fade" id="diagonalsInfoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_info">
+                <div class="row">
+                    <div class="col-12">
+                        A has no diagonals applied<br />B has diagonals applied<br />
+                        <img src="~/examples/diagonals.png" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Info Modals -->
+
+@section Scripts{
+    <script>
+        function toggleMergeNode() {
+            var isMerge = document.getElementById("isMerged").checked;
+            var isMergeNodeLabel = document.getElementById("isMergeNodeLabel");
+            var isMergeNode = document.getElementById("isMergeNode");
+            var mergeEdgeType = document.getElementById("mergeEdgeType");
+            var mergeEdgeTypeLabel = document.getElementById("mergeEdgeTypeLabel");
+            if (isMerge) {
+                isMergeNodeLabel.style.textDecoration = "";
+                isMergeNode.disabled = false;
+                mergeEdgeTypeLabel.style.textDecoration = "";
+                mergeEdgeType.disabled = false;
+            }
+            else {
+                isMergeNodeLabel.style.textDecoration = "line-through";
+                isMergeNode.disabled = true;
+                isMergeNode.checked = false;
+                mergeEdgeTypeLabel.style.textDecoration = "line-through";
+                mergeEdgeType.disabled = true;
+                mergeEdgeType.selectedIndex = 0;
+            }
+        }
+
+        function toggleDirected() {
+            var isDirected = document.getElementById("isDigraph").checked;
+            var arrowType = document.getElementById("arrowType");
+            var arrowTypeLabel = document.getElementById("arrowTypeLabel");
+
+            if (isDirected) {
+                arrowType.disabled = false;
+                arrowTypeLabel.style.textDecoration = "";
+            }
+            else {
+                arrowType.disabled = true;
+                arrowType.selectedIndex = 0;
+                arrowTypeLabel.style.textDecoration = "line-through";
+            }
+        }
+
+        function toggleNode(node) {
+            var nodeEnabled = document.getElementById('nodeEnabled-' + node).checked;
+
+            var isDisabled;
+            var textDec;
+            if (nodeEnabled) {
+                isDisabled = false;
+                textDec = '';
+            }
+            else {
+                isDisabled = true;
+                textDec = 'line-through';
+            }
+
+            var labels = document.getElementsByClassName(node + '-Label');
+            var inputs = document.getElementsByClassName(node + '-Input');
+            for (var i = 0; i < labels.length; i++) {
+                if (labels[i].classList.contains('parent-label')) {
+                    var refNode = document.getElementById('nodeEnabled-' + labels[i].dataset.noderef).checked;
+                    var thisNode = document.getElementById('nodeEnabled-' + labels[i].dataset.thisnode).checked;
+                    if (!refNode || !thisNode) {
+                        labels[i].style.textDecoration = 'line-through';
+                    }
+                    else {
+                        labels[i].style.textDecoration = textDec;
+                    }
+                }
+                else {
+                    labels[i].style.textDecoration = textDec;
+                }
+            }
+            for (var i = 0; i < inputs.length; i++) {
+                if (inputs[i].classList.contains('parent-input')) {
+                    var refNode = document.getElementById('nodeEnabled-' + inputs[i].dataset.noderef).checked;
+                    var thisNode = document.getElementById('nodeEnabled-' + inputs[i].dataset.thisnode).checked;
+                    if (!refNode || !thisNode) {
+                        inputs[i].disabled = true;
+                    }
+                    else {
+                        inputs[i].disabled = isDisabled;
+                    }
+                }
+                else {
+                    inputs[i].disabled = isDisabled;
+                }
+            }
+        }
+
+        function addOccurence(node) {
+            // Check if node is disabled
+            var nodeEnabled = document.getElementById('nodeEnabled-' + node).checked;
+            // if disabled, punt
+            if (!nodeEnabled) { return; }
+
+            // get by ID
+            var container = document.getElementById('occurenceContainer-' + node);
+
+            // Create input object
+            var newInput = document.createElement("input");
+            newInput.id = 'occurence-' + node;
+            newInput.classList.add('form-control');
+            newInput.classList.add('form-control-info');
+            newInput.classList.add('bg-dark');
+            newInput.classList.add('text-light');
+            newInput.type = 'text';
+            newInput.name = 'occurence';
+            newInput.style.marginBottom = '10px';
+
+            // Clone the last child (hidden input)
+            var hidden = container.children[container.children.length - 1].cloneNode(true);
+
+            // replace last input (hidden) with new input object
+            container.children[container.children.length - 1].replaceWith(newInput);
+
+            // insert the hidden input on the end again
+            container.appendChild(hidden);
+
+        }
+
+        function removeOccurence(node) {
+            // Check if node is disabled
+            var nodeEnabled = document.getElementById('nodeEnabled-' + node).checked;
+            // if disabled, punt
+            if (!nodeEnabled) { return; }
+
+            // get by ID
+            var container = document.getElementById('occurenceContainer-' + node);
+
+            // Check length, if <= 2 : punt
+            if (container.children.length <= 2) { return; }
+
+            // Clone the last child (hidden input)
+            var hidden = container.children[container.children.length - 1].cloneNode(true);
+
+            // Remove the last two children from the container
+            container.children[container.children.length - 1].remove();
+            container.children[container.children.length - 1].remove();
+
+            // Append the hidden input back
+            container.appendChild(hidden);
+        }
+
+        scrollBtn = document.getElementById("scrollBtn");
+
+        window.onscroll = function () { scrollFunction(); }
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollBtn.style.display = "block";
+            }
+            else {
+                scrollBtn.style.display = "none";
+            }
+        }
+
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+} 

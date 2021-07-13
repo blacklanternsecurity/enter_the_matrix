@@ -1,0 +1,61 @@
+﻿$white: #fafafa;
+$background: #222;
+
+html {
+    background: $background;
+}
+
+%dialog-box {
+    border-radius: 1em;
+    color: $white;
+    margin: 5% auto;
+    max-width: 25em;
+    padding: 2em;
+    position: relative;
+    width: 95%;
+
+    &:before {
+        background: $background;
+        content: attr(data-title);
+        left: 50%;
+        padding: 0 1em;
+        position: absolute;
+        text-transform: uppercase;
+        top: -0.6em;
+        text-align: center;
+        transform: translateX(-50%);
+    }
+}
+
+@mixin dialog-box ($color: #05d5fc) {
+    @extend %dialog-box;
+    border: 0.2em solid lighten($color,10%);
+    box-shadow: inset 0 0 0.4em $color, 0 0 0.4em $color;
+
+    &:before {
+        border-left: 0.2em solid lighten($color,10%);
+        border-right: 0.2em solid lighten($color,10%);
+        color: lighten($color, 30%);
+        text-shadow: 0 0 0.4em $color;
+    }
+
+    em {
+        color: lighten($color, 30%);
+    }
+}
+
+.dialog-box_info {
+    @include dialog-box();
+}
+
+.dialog-box_error {
+    @include dialog-box(red);
+}
+
+.dialog-box_success {
+    @include dialog-box(#39FF14);
+}
+
+.dialog-box_warning {
+    @include dialog-box(yellow);
+}

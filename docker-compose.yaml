@@ -1,0 +1,63 @@
+﻿# -------------------------------------------------------------------------------
+# Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
+#
+# Created:     10-15-2020
+# Copyright:   (c) BLS OPS LLC. 2020
+# Licence:     GPL
+# -------------------------------------------------------------------------------
+
+version: '3.3'
+
+networks:
+  etm_network:
+    driver: bridge
+
+services:
+
+  nginx:
+    restart: always
+    container_name: nginx
+    image: nginx
+    volumes:
+      - /var/matrix/app/enter_the_matrix/enter_the_matrix.conf:/etc/nginx/conf.d/default.conf
+      - /var/matrix/app/enter_the_matrix/matrix.cer:/var/matrix/app/enter_the_matrix/matrix.cer
+      - /var/matrix/app/enter_the_matrix/matrix.key:/var/matrix/app/enter_the_matrix/matrix.key
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - etm
+    networks:
+      - etm_network
+
+  etm:
+    restart: always
+    container_name: etm
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /var/matrix/app/enter_the_matrix
+    volumes:
+      - /var/matrix/app/enter_the_matrix:/var/matrix/app/enter_the_matrix
+    depends_on:
+      - mongo
+    expose:
+      - "5001"
+      - "5000"
+    networks:
+      - etm_network
+
+  mongo:
+    restart: always
+    container_name: mongo
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=CHANGEMESUCKAH
+    expose:
+      - "27017"
+    volumes:
+      - /var/matrix/mongo/configdb:/data/configdb
+      - /var/matrix/mongo/db:/data/db
+    networks:
+      - etm_network

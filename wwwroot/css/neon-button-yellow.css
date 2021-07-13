@@ -1,0 +1,41 @@
+﻿/* VARS */
+/* MIXINS */
+/* ANIMATIONS */
+@keyframes intermittente {
+  75% {
+    opacity: 0.7; } }
+
+.btn-neon-yellow {
+  display: inline-block;
+  margin-bottom: 0;
+  touch-action: manipulation;
+  cursor: pointer;
+  background-color: transparent;
+  background-image: none;
+  background-repeat: no-repeat;
+  background-position: 18px center;
+  border: 1px solid yellow;
+  white-space: nowrap;
+  outline: none;
+  color: yellow;
+  font-size: 16px;
+  line-height: 24px;
+  font-size: 1.6rem;
+  line-height: 2.4rem;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 2px;
+  font-weight: 300;
+  width: auto;
+  white-space: pre-wrap;
+  padding: 10px 1.8em;
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  font-family: 'courier', sans-serif; }
+  @media (min-width: 480px) {
+    .btn-neon-yellow {
+      width: auto; } }
+  .btn-neon-yellow:hover {
+    animation: intermittente 0.15s infinite alternate;
+    box-shadow: 0px 0px 35px rgba(255, 255, 204, 0.3), 0 0 11px rgba(255, 255, 204, 0.3), 0 0 2px rgba(255, 255, 0, 0.3), 0 0 1px rgba(255, 255, 204, 0.3), 0 0px 17px rgba(255, 255, 204, 0.3), inset 0px 0 17px rgba(255, 255, 204, 0.3), inset 0px 0 30px rgba(255, 255, 204, 0.3); }
