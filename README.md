@@ -1,3 +1,7 @@
+# BSides Augusta 2021
+
+[![ETM - BSidesAugusta2021](https://img.youtube.com/vi/kDKyXeqeX9c/0.jpg)](https://www.youtube.com/watch?v=kDKyXeqeX9c)
+
 # Table of Contents
 
    * [Deploying ETM](#deploying-etm)
