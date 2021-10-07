@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\graphs\" />
     <Folder Include="wwwroot\templates\" />
   </ItemGroup>
 

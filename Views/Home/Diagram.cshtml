@@ -8,25 +8,311 @@
 # -------------------------------------------------------------------------------
 -->
 
-@model List<Steps>
+@model Scenarios
 @{ Layout = null;
-                ViewData["Title"] = "Graph"; }
-<center>
-    <img src="~/graphs/Graph.png" />
-</center>
+    ViewData["Title"] = "Graph"; }
 
-<br />
-<br />
+<!--<script src="~/js/d3.min.js"></script>-->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script src="~/js/saveSvgAsPng.js"></script>
+<!--<button onclick="window.history.back();">BACK</button>-->
+<button onclick="saveSvgAsPng(document.getElementById('theSVG'), '@Model.Name' + '.png');">SAVE <span class="material-icons-outlined">save</span></button>
+<button onclick="copyMarkdown()">MARKDOWN <span class="material-icons-outlined">content_paste</span></button>
+<style>
 
-<h2>Markdown Export</h2>
-<pre>| Event |</pre>
-<pre>| ----- |</pre>
-@{ int i = 1;
-                foreach (var step in Model)
-                {
-                    string body = "| " + i.ToString() + ". " + step.Event + " |";
-    <pre>@body</pre> i++;
-                } }
-    </pre>
+    .link {
+        stroke: #000;
+        stroke-width: 3px;
+    }
 
-<button onclick="window.history.back();">BACK</button>
+        .link.low {
+            stroke: #4cff00;
+        }
+
+    #low {
+        fill: #4cff00;
+    }
+
+    .link.very-low {
+        stroke: #00ffe8;
+    }
+
+    #very-low {
+        fill: #00ffe8;
+    }
+
+    .link.moderate {
+        stroke: #ffd800;
+    }
+
+    #moderate {
+        fill: #ffd800;
+    }
+
+    .link.high {
+        stroke: #ff6a00;
+    }
+
+    #high {
+        fill: #ff6a00;
+    }
+
+    .link.very-high {
+        stroke: #ff0000;
+    }
+
+    #very-high {
+        fill: #ff0000;
+    }
+
+    .node {
+        cursor: move;
+        fill: #ccc;
+        stroke: #000;
+        stroke-width: 1.5px;
+    }
+
+        .node.fixed {
+            fill: #ccc;
+        }
+
+    .node-title {
+        font-size: 24px;
+    }
+</style>
+<div></div>
+<script>
+
+    var width = 0.95 * window.innerWidth,
+        height = 0.95 * window.innerHeight;
+
+    var force = d3.layout.force()
+        .size([width, height])
+        .charge(-1500)
+        .linkDistance(200)
+        .on("tick", tick);
+
+    var drag = force.drag()
+        .on("dragstart", dragstart);
+
+    var svg = d3.select("div").append("svg")
+        .attr("id", "theSVG")
+        .attr("width", width)
+        .attr("height", height);
+
+    // build the arrow.
+    svg.append("svg:defs").selectAll("marker")
+        .data(["very-low", "low", "moderate", "high", "very-high"])      // Different link/path types can be defined here
+        .enter().append("svg:marker")    // This section adds in the arrows
+        .attr("id", String)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 0)
+        .attr("refY", 0)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+        .append("svg:path")
+        .attr("d", "M0,-5L10,0L0,5");
+
+    var link = svg.selectAll(".link"),
+        text = svg.selectAll(".text"),
+        tspan = svg.selectAll(".tspan"),
+        node = svg.selectAll(".node");
+
+    d3.json("/graphs/graph.json", function (error, graph) {
+        if (error) throw error;
+
+        force
+            .nodes(graph.nodes)
+            .links(graph.links)
+            .start();
+
+        link = link.data(graph.links)
+            .enter()
+            .append("g")
+            .attr("class", "link-group")
+            .append("polyline")
+            .attr("class", function (d) { return "link " + d.risk; })
+            .attr("marker-mid", function (d) { return "url(#" + d.risk + ")"; });
+
+        node = node.data(graph.nodes)
+            .enter()
+            .append("g")
+            .attr("class", "node-group")
+            /*.append("circle")
+            .attr("class", "node")
+            .attr("r", 12)
+            .on("dblclick", dblclick)
+            .call(drag);*/
+            .append("image")
+            .attr("xlink:href", function (d) { return d.icon; })
+            .attr("x", "-32")
+            .attr("y", "-32")
+            .attr("width", "64")
+            .attr("heigh", "64")
+            .on("dblclick", dblclick)
+            .call(drag);
+
+
+        text = svg.selectAll(".node-group")
+            .append("text")
+            .data(force.nodes())
+            .text(function (d) { return d.title; })
+            .attr("x", function (d) { return d.x; })
+            .attr("y", function (d) { return d.y; })
+            .attr("text-anchor", "middle")
+            .attr("class", "node-title")
+            .call(wrap, 200);
+
+        link_text = svg.selectAll(".link-group")
+            .append("text")
+            .data(force.links())
+            .text(function (d) { return d.label; })
+            .attr("font-family", "Arial, Helvetica, sans-serif")
+            .attr("x", function (d) {
+                if (d.target.x > d.source.x) { return (d.source.x + (d.target.x - d.source.x) / 2); }
+                else { return (d.target.x + (d.source.x - d.target.x) / 2); }
+            })
+            .attr("y", function (d) {
+                if (d.target.y > d.source.y) { return (d.source.y + (d.target.y - d.source.y) / 2); }
+                else { return (d.target.y + (d.source.y - d.target.y) / 2); }
+            }).attr("fill", "Black")
+            .style("font", "bold 18px Arial")
+            .attr("dy", 20);
+    });
+
+    function tick() {
+        /* Following only for paths
+         link.attr("x1", function (d) { return d.source.x; })
+            .attr("y1", function (d) { return d.source.y; })
+            .attr("x2", function (d) { return d.target.x; })
+            .attr("y2", function (d) { return d.target.y; });
+            */
+        link.attr("points", function (d) {
+            return d.source.x + "," + d.source.y + " " +
+                (d.source.x + d.target.x) / 2 + "," + (d.source.y + d.target.y) / 2 + " " +
+                d.target.x + "," + d.target.y;
+        });
+
+        node.attr("x", function (d) { return d.x - 32; })
+            .attr("y", function (d) { return d.y - 32; });
+
+        text.attr("x", function (d) { return d.x; })
+            .attr("y", function (d) { return d.y + 50; });
+
+        svg.selectAll("tspan")
+            .attr("x", function (d) { return d.x; })
+            .attr("y", function (d) { return d.y + 50; });
+
+        link_text.attr("x", function (d) {
+            if (d.target.x > d.source.x) { return (d.source.x + (d.target.x - d.source.x) / 2); }
+            else { return (d.target.x + (d.source.x - d.target.x) / 2); }
+        })
+            .attr("y", function (d) {
+                if (d.target.y > d.source.y) { return (d.source.y + (d.target.y - d.source.y) / 2); }
+                else { return (d.target.y + (d.source.y - d.target.y) / 2); }
+            });
+    }
+
+    function tick_alpha() {
+        link.attr("x1", function (d) {
+            modifier = 0;
+            difference = d.source.x - d.target.x;
+            sign = Math.sign(difference);
+            if (Math.abs(difference) > 26 && sign == -1) { modifier = 28; }
+            else if (Math.abs(difference) > 26 && sign == 1) { modifier = -28; }
+            return d.source.x + modifier;
+        })
+            .attr("y1", function (d) {
+                modifier = 0;
+                difference = d.source.y - d.target.y;
+                sign = Math.sign(difference);
+                if (Math.abs(difference) > 26) {
+                    modifier = 28 * -1 * sign;
+                }
+                return d.source.y + modifier;
+            })
+            .attr("x2", function (d) {
+                modifier = 0;
+                difference = d.source.x - d.target.x;
+                sign = Math.sign(difference);
+                if (Math.abs(difference) > 26) {
+                    modifier = 28 * sign;
+                }
+                return d.target.x + modifier;
+            })
+            .attr("y2", function (d) {
+                modifier = 0;
+                difference = d.source.y - d.target.y;
+                sign = Math.sign(difference);
+                if (Math.abs(difference) > 26) {
+                    modifier = 28 * sign;
+                }
+                return d.target.y + modifier;
+            });
+
+        node.attr("x", function (d) { return d.x - 32; })
+            .attr("y", function (d) { return d.y - 32; });
+
+        text.attr("x", function (d) { return d.x; })
+            .attr("y", function (d) { return d.y + 50; });
+
+        svg.selectAll("tspan")
+            .attr("x", function (d) { return d.x; })
+            .attr("y", function (d) { return d.y + 50; });
+    }
+
+    function dblclick(d) {
+        d3.select(this).classed("fixed", d.fixed = false);
+    }
+
+    function dragstart(d) {
+        d3.select(this).classed("fixed", d.fixed = true);
+    }
+
+    function wrap(text, width) {
+        text.each(function () {
+            //console.log(d3.select(this).text());
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1, // ems
+                x = text.attr("x"),
+                y = text.attr("y"),
+                dy = 0,//parseFloat(text.attr("dy")),
+                tspan = text.text(null)
+                    .append("tspan")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word)
+                tspan.text(line.join(" "))
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop()
+                    tspan.text(line.join(" "))
+                    line = [word]
+                    tspan = text.append("tspan")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                        .text(word);
+                }
+            }
+        })
+    }
+
+    function copyMarkdown() {
+        var table = document.getElementById('markdown-table');
+        var content = table.innerHTML;
+        navigator.clipboard.writeText(content);
+    }
+</script>
+
+<pre id="markdown-table" style="display:none;">
+@ViewBag.MarkdownTable
+</pre>

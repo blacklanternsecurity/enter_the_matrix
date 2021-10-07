@@ -29,6 +29,7 @@ using Manatee.Json;
 using Manatee.Json.Serialization;
 using Manatee.Json.Schema;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Enter_The_Matrix.Controllers
 {
@@ -101,7 +102,7 @@ namespace Enter_The_Matrix.Controllers
             Assessments assessment = _assessmentsService.GetByIdAsync(assessmentId).Result;
 
             // Delete the threat tree associated with the assessment
-            await _treeService.DeleteAsync(assessment.ThreatTreeId);
+            if (assessment.ThreatTreeId != null && assessment.ThreatTreeId != "") { await _treeService.DeleteAsync(assessment.ThreatTreeId); }
 
             // Clean out scenarios and events
             foreach (var scenarioId in assessment.Scenarios)
@@ -1188,6 +1189,7 @@ namespace Enter_The_Matrix.Controllers
         {
             if (!User.Identity.IsAuthenticated) { return RedirectToAction("Login", "Security"); }
 
+            /* Deprecated GraphViz Code
             List<string> document = new List<string>();
 
             Scenarios scenario = await _scenariosService.GetByIdAsync(scenarioId);
@@ -1201,41 +1203,7 @@ namespace Enter_The_Matrix.Controllers
 
             // Fixing root node issue
             var first = stepList.First();
-            if (
-                first.ThreatSource == "Outsider" || 
-                first.ThreatSource == "Insider" || 
-                first.ThreatSource == "Trusted Insider" || 
-                first.ThreatSource == "Privileged Insider"
-                )
-            {
-                nodeList.Add(new Node(null, "malicious-actor", first.ThreatSource, "", "root"));
-            }
-            else if (
-                first.ThreatSource == "Partner Organization" ||
-                first.ThreatSource == "Competitor Organization" ||
-                first.ThreatSource == "Supplier Organization" ||
-                first.ThreatSource == "Customer Organization"
-                )
-            {
-                nodeList.Add(new Node(null, "group", first.ThreatSource, "", "root"));
-            }
-            else if (
-                first.ThreatSource == "Ad Hoc Group" ||
-                first.ThreatSource == "Established Group"
-                )
-            {
-                nodeList.Add(new Node(null, "organization", first.ThreatSource, "", "root"));
-            }
-            else if (
-                first.ThreatSource == "Nation State"
-                )
-            {
-                nodeList.Add(new Node(null, "guard-personnel", first.ThreatSource, "", "root"));
-            }
-            else
-            {
-                nodeList.Add(new Node(null, "unknown-suspect", first.ThreatSource, "", "root"));
-            }
+            
 
             foreach (var step in stepList)
             {
@@ -1341,7 +1309,133 @@ namespace Enter_The_Matrix.Controllers
             document.Add("\tfontsize=\"28\";");
             document.Add("\tlabel=\"" + scenario.Name.Replace("\"", "\\\"") + "\";");
             document.Add("}");
+            */
 
+            // Hijacking flow for D3 //
+
+            Scenarios scenario = await _scenariosService.GetByIdAsync(scenarioId);
+
+            List<Steps> eventList = new List<Steps>();
+            foreach (string stepId in scenario.Steps) { eventList.Add(await _stepsService.GetByIdAsync(stepId)); }
+
+            string quoteEscaper = @"\" + "\"";
+
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine("wwwroot/graphs/", "graph.json")))
+            {
+                outputFile.WriteLine("{");
+                outputFile.WriteLine("\"nodes\": [");
+                List<string> Ids = new List<string>();
+                List<(string parent, string id, string risk, int step)> links = new List<(string parent, string id, string risk, int step)>();
+                int counter = 0;
+
+                // Accounting for root node
+                Ids.Add("");
+
+                // Setting icon according to first event threat actor
+                var first = eventList.First();
+                string attackerIcon = "";
+
+                if (
+                first.ThreatSource == "Outsider" ||
+                first.ThreatSource == "Insider" ||
+                first.ThreatSource == "Trusted Insider" ||
+                first.ThreatSource == "Privileged Insider"
+                )
+                {
+                    attackerIcon = "malicious-actor";
+                }
+                else if (
+                    first.ThreatSource == "Partner Organization" ||
+                    first.ThreatSource == "Competitor Organization" ||
+                    first.ThreatSource == "Supplier Organization" ||
+                    first.ThreatSource == "Customer Organization"
+                    )
+                {
+                    attackerIcon = "group";
+                }
+                else if (
+                    first.ThreatSource == "Ad Hoc Group" ||
+                    first.ThreatSource == "Established Group"
+                    )
+                {
+                    attackerIcon = "organization";
+                }
+                else if (
+                    first.ThreatSource == "Nation State"
+                    )
+                {
+                    attackerIcon = "guard-personnel";
+                }
+                else
+                {
+                    attackerIcon = "unknown-suspect";
+                }
+
+                outputFile.WriteLine("{");
+                outputFile.WriteLine($"\"x\": 0,");
+                outputFile.WriteLine($"\"y\": 0,");
+                outputFile.WriteLine($"\"title\": \"{first.ThreatSource}\",");
+                outputFile.WriteLine($"\"icon\": \"/icons/{attackerIcon}.png\"");
+                outputFile.WriteLine("},");
+
+                foreach (Steps ev in eventList)
+                {
+
+                    // Inject Node Information
+                    if (!Ids.Contains(ev.Id)) { Ids.Add(ev.Id); }
+                    outputFile.WriteLine("{");
+                    outputFile.WriteLine("\"x\": 0,");
+                    outputFile.WriteLine("\"y\": 0,");
+                    outputFile.WriteLine($"\"title\":  \"{ev.GraphNode.EntityDescription.Replace(@"\", @"\\").Replace("\"", quoteEscaper) }\",");
+                    outputFile.WriteLine($"\"icon\": \"/icons/{ev.GraphNode.EntityType}.png\"");
+
+                    string end = "}";
+                    if (counter++ < eventList.Count-1) { end = end + ","; }
+                    outputFile.WriteLine(end);
+
+                    // Collect link information
+                    foreach (string parentId in ev.GraphNode.ParentId)
+                    {
+                        string parent = "";
+                        if (parentId != null) { parent = parentId; }
+                        links.Add((parent, ev.Id, ev.Risk.ToLower().Replace(" ", "-"), counter));
+                    }
+                }
+                outputFile.WriteLine("],");
+                outputFile.WriteLine("\"links\": [");
+                counter = 0;
+                foreach (var link in links)
+                {
+                    outputFile.WriteLine("{");
+                    outputFile.WriteLine($"\"source\": {Ids.IndexOf(link.parent)},");
+                    outputFile.WriteLine($"\"target\": {Ids.IndexOf(link.id)},");
+                    outputFile.WriteLine($"\"risk\": \"{link.risk}\",");
+                    outputFile.WriteLine($"\"label\": \"{link.step}.\"");
+                    
+                    string end = "}";
+                    if (counter++ < links.Count-1) { end = end + ","; }
+                    outputFile.WriteLine(end);
+                }
+                outputFile.WriteLine("]");
+                outputFile.WriteLine("}");
+                
+            }
+
+            string markdownTable = "| Event |\n| ----- |\n";
+            int eventCounter = 1;
+            foreach (var ev in eventList)
+            {
+                markdownTable += "| " + eventCounter++.ToString() + ". " + ev.Event + " |\n";
+            }
+
+            ViewBag.MarkdownTable = markdownTable;
+
+            scenario.Name = scenario.Name.Replace(" ", "_");
+            return View(scenario);
+
+            // End Hijacking, following code is deprecated
+
+            /*
             // write the text to a DOT file
             using (StreamWriter outputFile = new StreamWriter(Path.Combine("wwwroot/graphs/", "graph.dot")))
             {
@@ -1373,6 +1467,7 @@ namespace Enter_The_Matrix.Controllers
 
 
             return View(stepList);
+            */
         }
 
         #endregion
@@ -2579,6 +2674,58 @@ namespace Enter_The_Matrix.Controllers
 
         }
 
+        public async Task<IActionResult> EditTreeCategories(string[] categories, string[] colors, string threatTreeId, string assessmentId)
+        {
+            if (!User.Identity.IsAuthenticated) { return RedirectToAction("Login", "Security"); }
+
+            ThreatTree tree = await _treeService.GetByIdAsync(threatTreeId);
+
+            // Build the new list of categories we want to use
+            List<string[]> newCategories = new List<string[]>();
+            for (int i = 0; i < categories.Length; i++)
+            {
+                newCategories.Add(new string[]
+                {
+                    categories[i], colors[i], tree.ColorList.GetValueOrDefault(colors[i])
+                });
+            }
+
+            // Check to see which of the old categories are no longer used
+            List<string> removeCategories = new List<string>();
+            foreach (string[] category in tree.Categories)
+            {
+                if (!categories.Contains(category[0]))
+                {
+                    removeCategories.Add(category[0]);
+                }
+            }
+
+            // Reset each of the nodes which belongs to the removed categories
+            foreach (ThreatTreeNode node  in tree.NodeList)
+            {
+               if (removeCategories.Contains(node.Classification[0]))
+               {
+                    node.Classification = newCategories.First();
+               }
+               // If it is not to be reset, verify the colors are up to date
+               else
+                {
+                    foreach (string[] category in newCategories)
+                    {
+                        if (node.Classification[0] == category[0]) { node.Classification = category; break; }
+                    }
+                }
+            }
+
+            // Set the tree categories to our new list
+            tree.Categories = newCategories;
+
+            // Update the tree
+            await _treeService.UpdateAsync(tree.Id, tree);
+
+            return RedirectToAction("EditTree", "Home", new { threatTreeId = tree.Id, assessmentId = assessmentId });
+        }
+
         public async Task<IActionResult> ExportTree(string treeId)
         {
             if (!User.Identity.IsAuthenticated) { return RedirectToAction("Login", "Security"); }
@@ -2614,8 +2761,9 @@ namespace Enter_The_Matrix.Controllers
             foreach (var category in tree.Categories)
             {
                 // Handle Clustering
-                if (tree.IsClustered) { document.Add("\tsubgraph cluster_" + category[0].Replace(" ", "").ToLower() + " {"); }
-                else { document.Add("\tsubgraph " + category[0].Replace(" ", "").ToLower() + " {"); }
+                string cleanCategory = Regex.Replace(category[0], "[^0-9a-zA-Z_]+", "_");
+                if (tree.IsClustered) { document.Add("\tsubgraph cluster_" + cleanCategory.ToLower() + " {"); }
+                else { document.Add("\tsubgraph " + cleanCategory.ToLower() + " {"); }
                 
 
                 List<string> nodesInSubgraph = new List<string>();
@@ -2771,7 +2919,8 @@ namespace Enter_The_Matrix.Controllers
             string legendEdge = "";
             foreach (var category in tree.Categories)
             {
-                document.Add("\tsubgraph " + category[0].Replace(" ","").ToLower() + " {");
+                string cleanCategory = Regex.Replace(category[0], "[^0-9a-zA-Z_]+", "_");
+                document.Add("\tsubgraph " + cleanCategory.ToLower() + " {");
                 document.Add("\t\t" + legendCounter + " [color=" + category[1] + ",style=\"rounded,filled\",shape=box,label=\"" + category[0] + "\"];");
                 document.Add("\t\t{rank=same; " + legendCounter + ";}");
                 document.Add("\t}");
@@ -2812,6 +2961,15 @@ namespace Enter_The_Matrix.Controllers
 
             if (string.IsNullOrEmpty(error)) { Console.WriteLine(output); }
             else { Console.WriteLine(error); }
+
+            string treePath = @"wwwroot/graphs/Tree.png";
+            string legendPath = @"wwwroot/graphs/Legend.png";
+
+            DateTime treeDate = System.IO.File.GetLastWriteTime(treePath);
+            DateTime legendDate = System.IO.File.GetLastWriteTime(legendPath);
+
+            ViewBag.TreeDate = treeDate;
+            ViewBag.LegendDate = legendDate;
 
             return View();
         }
