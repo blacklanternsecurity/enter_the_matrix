@@ -104,7 +104,16 @@ namespace Enter_The_Matrix
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    if (!ctx.Context.User.Identity.IsAuthenticated && !( ctx.File.Name.EndsWith(".css") || ctx.File.Name.EndsWith(".scss") || ctx.File.Name.EndsWith(".ttf") ) )
+                    {
+                        ctx.Context.Response.Redirect("/");
+                    }
+                }
+            });
 
             app.UseRouting();
 

@@ -90,6 +90,7 @@ span.event {
     color: #4cff00;
     display: inline-block;
     max-width: 500px;
+    min-width: 500px;
     white-space: normal;
     overflow-wrap: break-word;
 }
@@ -251,6 +252,21 @@ input[type=range].custom-range {
     }
 
     .form-control-info:focus {
+        border-color: #37ddfd;
+        box-shadow: 0 0 0 0.2rem rgba(55, 221, 253, 0.25);
+    }
+
+    .form-control-success:focus-visible {
+        border-color: #4cff00;
+        box-shadow: 0 0 0 0.2rem rgba(76, 255, 0, 0.25);
+    }
+    
+    .form-control-warning:focus-visible {
+        border-color: #ffff33;
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 51, 0.25);
+    }
+    
+    .form-control-info:focus-visible {
         border-color: #37ddfd;
         box-shadow: 0 0 0 0.2rem rgba(55, 221, 253, 0.25);
     }

@@ -19,8 +19,8 @@
         <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     </head>
     <body>
-        <img style="max-width:85vw; max-height:max-content;" src="~/graphs/Tree.png" />
-        <img style="max-width:15vw; max-height:max-content;" src="~/graphs/Legend.png" />
+        <img style="max-width:85vw; max-height:max-content;" src="~/graphs/Tree.png?v=@ViewBag.TreeDate" />
+        <img style="max-width:15vw; max-height:max-content;" src="~/graphs/Legend.png?v=@ViewBag.LegendDate" />
         <br/><br/>
         <button onclick="window.history.back();">BACK</button>
     </body>

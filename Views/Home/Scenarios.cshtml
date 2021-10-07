@@ -58,7 +58,7 @@
         <div class="modal-content">
             <div class="modal-body dialog-box_success">
                 <center>
-                    <form asp-action="CreateTree" asp-controller="Home" method="post">
+                    <form asp-action="CreateTree" asp-controller="Home" method="post" name="treeCreateForm">
                         <div class="form-group factor-container" id="category-container">
                             <div class="row">
                                 <div class="col-12" style="margin-bottom:15px;">
@@ -72,7 +72,7 @@
                                     <input name="categories" type="text" id="threat-tree-categories" class="form-control form-control-success bg-dark text-light" placeholder="">
                                 </div>
                                 <div class="col-4" style="margin-bottom:5px;">
-                                    <select name ="colors" id="category-color-picker" style="background-color: rgb(240, 248, 255);" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor">
+                                    <select class="categorySelectors" name ="colors" id="category-color-picker" style="background-color: rgb(240, 248, 255);" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor">
                                         @{ foreach (var entry in ViewBag.ThreatTreeTemplate.ColorList)
                                             {
                                                 <option style="background-color:@entry.Value">@entry.Key</option> 
@@ -83,7 +83,7 @@
                             </div>
                         </div>
                         <input type="hidden" name="assessmentId" value="@Model.assessment.Id" />
-                        <button type="submit" class="btn btn-success">START</button>
+                        <button type="button" class="btn btn-success" onclick="checkTree()">START</button>
                     </form>
                 </center>
             </div>
@@ -245,6 +245,21 @@
             else {
                 container.children[container.children.length - 1].outerHTML = "";
             }
+        }
+
+        function checkTree() {
+            var selectors = document.getElementsByClassName("categorySelectors");
+            var colors = [];
+            for (var i = 0; i < selectors.length; i++) {
+                if (colors.includes(selectors[i].value)) {
+                    alert("Please choose unique colors for each category.");
+                    return false;
+                }
+                else {
+                    colors.push(selectors[i].value);
+                }
+            }
+            document.treeCreateForm.submit();
         }
     </script>
 }

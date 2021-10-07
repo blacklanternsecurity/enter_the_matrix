@@ -1,14 +1,16 @@
 CHANGELOG
 ============
+# October 7th, 2021
 
-# July 12th, 2021
+## Changes
 
-ETM v1.0 Official Release
-
-## New Features:
-
+- Threat Trees
+	+ Now possible to edit categories in an existing threat tree
+- Threat Narrative Graphs
+	+ Updated to use D3.js library for graphs
 - Template Packs
-  + Now possible to import and export template packs as JSON files
+	+ Can import/export template packs as JSON files
+- Multiple bug fixes in all areas
 
 # June 8th, 2021
 
@@ -19,7 +21,7 @@ Techniques have been edited to reflect changes present in ATT&CK v9
 ## New Features:
 
 - Threat Trees
-  + MITRE ATT&CK IDs are pulled from an entire assessment and populate a new design page for threat trees. From the design page you can customize many aspects of how the graph will appear when exported. This can be found by navigating to an Assessment and clicking the THREAT TREE button. Please note that once categories have been created for a threat tree, those are not changeable without deleting the tree and starting over. This was implemented to aid when creating the outbrief graphs we've seen lately
+	+ MITRE ATT&CK IDs are pulled from an entire assessment and populate a new design page for threat trees. From the design page you can customize many aspects of how the graph will appear when exported. This can be found by navigating to an Assessment and clicking the THREAT TREE button. Please note that once categories have been created for a threat tree, those are not changeable without deleting the tree and starting over. This was implemented to aid when creating the outbrief graphs we've seen lately
 - MITRE ATT&CK For ICS
   + Now included in your options when selecting an appropriate ATT&CK technique under the EditEvent and EditSteplate pages
 - HTML Reports
