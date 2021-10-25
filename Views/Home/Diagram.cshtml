@@ -189,10 +189,7 @@
             .data(force.nodes())
             .attr("width", d => d.bbox.width + 2 * xMargin)
             .attr("height", d => d.bbox.height + 2 * yMargin)
-            .attr("class", "node-rects")
-            .attr("transform", function (d) {
-                return `translate(-${xMargin}, -${d.bbox.height * 0.8 + yMargin})`
-            });
+            .attr("class", "node-rects");
         // end
 
         link_text = svg.selectAll(".link-group")
@@ -245,9 +242,14 @@
                 else { return (d.target.y + (d.source.y - d.target.y) / 2); }
             });
 
+        svg.selectAll("text")
+            .each(function (d) { d.bbox = this.getBBox(); });
+
         svg.selectAll("rect")
-            .attr("x", function (d) { return d.x - d.bbox.width/2; })
-            .attr("y", function (d) { return d.y + 55 });
+            .data(force.nodes())
+            .attr("x", function (d) { return d.x - d.bbox.width / 2 - 4; })
+            .attr("y", function (d) { return d.y + 32;; })
+            .attr("class", "node-rects");
     }
 
     function tick_alpha() {
@@ -370,7 +372,6 @@
         var rectangles = document.getElementsByClassName("node-rects");
         for (i = 0; i < rectangles.length; i++) {
             var color = rectangles[i].style.fill;
-            alert(color);
             if (color == "rgb(210, 210, 210)") { rectangles[i].style.fill = "rgb(74, 74, 74)"; }
             else if (color == "rgb(74, 74, 74)") { rectangles[i].style.fill = "rgb(210, 210, 210)"; }
             else { rectangles[i].style.fill = "rgb(74, 74, 74)"; }
