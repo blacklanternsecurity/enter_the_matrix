@@ -56,7 +56,7 @@
 <div class="modal fade" id="treeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-body dialog-box_success">
+            <div class="modal-body dialog-box_success" id="categoryRestoreLocation">
                 <center>
                     <form asp-action="CreateTree" asp-controller="Home" method="post" name="treeCreateForm">
                         <div class="form-group factor-container" id="category-container">
@@ -67,20 +67,35 @@
                                     <span style="float: right; cursor:pointer;" onclick="removeCategory();" class="material-icons"><a>remove_circle</a></span>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-8" style="margin-bottom:5px;">
-                                    <input name="categories" type="text" id="threat-tree-categories" class="form-control form-control-success bg-dark text-light" placeholder="">
-                                </div>
-                                <div class="col-4" style="margin-bottom:5px;">
-                                    <select class="categorySelectors" name ="colors" id="category-color-picker" style="background-color: rgb(240, 248, 255);" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor">
-                                        @{ foreach (var entry in ViewBag.ThreatTreeTemplate.ColorList)
-                                            {
-                                                <option style="background-color:@entry.Value">@entry.Key</option> 
-                                            } 
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+                            @{ 
+                                foreach ((string, string, string) category in ViewBag.DefaultCategories)
+                                {
+                                    <div class="row">
+                                        <div id="remove_this_row_col" class="col-1" style="margin-bottom:5px;">
+                                            <span style="margin-top:8px; float: left; cursor:pointer;" onclick="removeCategory2(this);" class="material-icons"><a>delete</a></span>
+                                        </div>
+                                        <div class="col-7" style="margin-bottom:5px;">
+                                            <input name="categories" type="text" id="threat-tree-categories" class="form-control form-control-success bg-dark text-light categoryNames" placeholder="" value="@category.Item1">
+                                        </div>
+                                        <div class="col-4" style="margin-bottom:5px;">
+                                            <select class="categorySelectors" name ="colors" id="category-color-picker" style="background-color: @category.Item3;" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor">
+                                                @{ foreach (var entry in ViewBag.ThreatTreeTemplate.ColorList)
+                                                    {
+                                                        if (category.Item2 == entry.Key)
+                                                        {
+                                                            <option selected style="background-color:@entry.Value">@entry.Key</option> 
+                                                        }
+                                                        else
+                                                        {
+                                                            <option style="background-color:@entry.Value">@entry.Key</option> 
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                            }
                         </div>
                         <input type="hidden" name="assessmentId" value="@Model.assessment.Id" />
                         <button type="button" class="btn btn-success" onclick="checkTree()">START</button>
@@ -208,6 +223,8 @@
             var inp = document.createElement("input");
             var sel = document.getElementById("category-color-picker").cloneNode(true);
 
+            var remov = document.getElementById("remove_this_row_col").cloneNode(true);
+
             row.classList.add('row');
 
             colc.classList.add('col-4');
@@ -217,19 +234,21 @@
 
             colc.appendChild(sel);
 
-            coli.classList.add('col-8');
+            coli.classList.add('col-7');
             coli.style.marginBottom = '5px';
 
             inp.classList.add('form-control');
             inp.classList.add('form-control-success');
             inp.classList.add('bg-dark');
             inp.classList.add('text-light');
+            inp.classList.add('categoryNames');
             inp.placeholder = '';
             inp.value = '';
             inp.name = 'categories';
 
             coli.appendChild(inp);
 
+            row.appendChild(remov);
             row.appendChild(coli);
             row.appendChild(colc);
 
@@ -247,8 +266,20 @@
             }
         }
 
+        function removeCategory2(button) {
+            var row = button.parentNode.parentNode;
+            var container = document.getElementById("categoryRestoreLocation").childNodes[1];
+            if (container.childNodes[1].length <= 2) {
+                return;
+            }
+            else {
+                row.outerHTML = "";
+            }
+        }
+
         function checkTree() {
             var selectors = document.getElementsByClassName("categorySelectors");
+            var names = document.getElementsByClassName("categoryNames");
             var colors = [];
             for (var i = 0; i < selectors.length; i++) {
                 if (colors.includes(selectors[i].value)) {
@@ -257,6 +288,13 @@
                 }
                 else {
                     colors.push(selectors[i].value);
+                }
+            }
+
+            for (var j = 0; j < names.length; j++) {
+                if (names[j].value == "") {
+                    alert("Please supply a category name for each row added.");
+                    return false;
                 }
             }
             document.treeCreateForm.submit();

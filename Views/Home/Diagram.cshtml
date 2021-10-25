@@ -20,6 +20,7 @@
 <!--<button onclick="window.history.back();">BACK</button>-->
 <button onclick="saveSvgAsPng(document.getElementById('theSVG'), '@Model.Name' + '.png');">SAVE <span class="material-icons-outlined">save</span></button>
 <button onclick="copyMarkdown()">MARKDOWN <span class="material-icons-outlined">content_paste</span></button>
+<button onclick="blackWhite()">BLACK<span class="material-icons-outlined">swap_horizontal_circle</span>WHITE</button>
 <style>
 
     .link {
@@ -119,7 +120,8 @@
     var link = svg.selectAll(".link"),
         text = svg.selectAll(".text"),
         tspan = svg.selectAll(".tspan"),
-        node = svg.selectAll(".node");
+        node = svg.selectAll(".node"),
+        rect = svg.selectAll(".rect");
 
     d3.json("/graphs/graph.json", function (error, graph) {
         if (error) throw error;
@@ -155,6 +157,17 @@
             .on("dblclick", dblclick)
             .call(drag);
 
+        // Adding for text backgrounds
+        rect = svg.selectAll(".node-group")
+            .append("rect")
+            .data(force.nodes())
+            .attr("x", function (d) { return d.x; })
+            .attr("y", function (d) { return d.y; })
+            .attr("rx", 6)
+            .attr("ry", 6)
+            .style("fill", "#d2d2d2")
+            .style("opacity", "0.9");
+        // end
 
         text = svg.selectAll(".node-group")
             .append("text")
@@ -165,6 +178,22 @@
             .attr("text-anchor", "middle")
             .attr("class", "node-title")
             .call(wrap, 200);
+
+        //Adding for text background
+        svg.selectAll("text")
+            .each(function (d) { d.bbox = this.getBBox(); });
+
+        const xMargin = 4;
+        const yMargin = 2;
+        svg.selectAll("rect")
+            .data(force.nodes())
+            .attr("width", d => d.bbox.width + 2 * xMargin)
+            .attr("height", d => d.bbox.height + 2 * yMargin)
+            .attr("class", "node-rects")
+            .attr("transform", function (d) {
+                return `translate(-${xMargin}, -${d.bbox.height * 0.8 + yMargin})`
+            });
+        // end
 
         link_text = svg.selectAll(".link-group")
             .append("text")
@@ -180,6 +209,7 @@
                 else { return (d.target.y + (d.source.y - d.target.y) / 2); }
             }).attr("fill", "Black")
             .style("font", "bold 18px Arial")
+            .attr("class", "link-numbers")
             .attr("dy", 20);
     });
 
@@ -200,11 +230,11 @@
             .attr("y", function (d) { return d.y - 32; });
 
         text.attr("x", function (d) { return d.x; })
-            .attr("y", function (d) { return d.y + 50; });
+            .attr("y", function (d) { return d.y + 55; });
 
         svg.selectAll("tspan")
             .attr("x", function (d) { return d.x; })
-            .attr("y", function (d) { return d.y + 50; });
+            .attr("y", function (d) { return d.y + 55; });
 
         link_text.attr("x", function (d) {
             if (d.target.x > d.source.x) { return (d.source.x + (d.target.x - d.source.x) / 2); }
@@ -214,6 +244,10 @@
                 if (d.target.y > d.source.y) { return (d.source.y + (d.target.y - d.source.y) / 2); }
                 else { return (d.target.y + (d.source.y - d.target.y) / 2); }
             });
+
+        svg.selectAll("rect")
+            .attr("x", function (d) { return d.x - d.bbox.width/2; })
+            .attr("y", function (d) { return d.y + 55 });
     }
 
     function tick_alpha() {
@@ -310,6 +344,38 @@
         var table = document.getElementById('markdown-table');
         var content = table.innerHTML;
         navigator.clipboard.writeText(content);
+    }
+
+    function blackWhite() {
+        var titles = document.getElementsByClassName("node-title");
+        for (i = 0; i < titles.length; i++) {
+            if (titles[i].style.fill == "black") { titles[i].style.fill = "white"; }
+            else if (titles[i].style.fill == "white") { titles[i].style.fill = "black"; }
+            else { titles[i].style.fill = "white"; }
+        }
+
+        var linkNumbers = document.getElementsByClassName("link-numbers");
+        for (i = 0; i < linkNumbers.length; i++) {
+            var color = linkNumbers[i].style.fill;
+            if (color == "black") { linkNumbers[i].style.fill = "white"; }
+            else if (color == "white") { linkNumbers[i].style.fill = "black"; }
+            else { linkNumbers[i].style.fill = "white"; }
+        }
+
+        var body = document.body;
+        if (body.style.backgroundColor == "white") { body.style.backgroundColor = "black"; }
+        else if (body.style.backgroundColor == "black") { body.style.backgroundColor = "white"; }
+        else { body.style.backgroundColor = "black"; }
+
+        var rectangles = document.getElementsByClassName("node-rects");
+        for (i = 0; i < rectangles.length; i++) {
+            var color = rectangles[i].style.fill;
+            alert(color);
+            if (color == "rgb(210, 210, 210)") { rectangles[i].style.fill = "rgb(74, 74, 74)"; }
+            else if (color == "rgb(74, 74, 74)") { rectangles[i].style.fill = "rgb(210, 210, 210)"; }
+            else { rectangles[i].style.fill = "rgb(74, 74, 74)"; }
+        }
+
     }
 </script>
 
