@@ -6,7 +6,7 @@
         <div class="d-flex justify-content-between align-items-center">
             <button type="button" class="btn-neon-yellow" id="return-scenario-btn" onclick="location.href='/Home/Scenarios?assessmentId=@ViewBag.assessmentId'">BACK</button>
             <button type="submit" class="btn-neon-green" id="save-tree-btn">SAVE</button>
-            <button type="button" class="btn-neon-green" onclick="location.href='/Home/ExportTree?treeId=@Model.Id'" id="export-tree-btn">EXPORT</button>
+            <button type="button" class="btn-neon-green" onclick="window.open('/Home/ExportTree?treeId=@Model.Id', '_blank');" id="export-tree-btn">EXPORT</button>
             <button type="button" class="btn-neon-red" data-target="#deleteModal" data-toggle="modal" id="delete-tree-btn">DELETE</button>
         </div>
     </div>
@@ -940,7 +940,7 @@ else
                 </div>
 
                 <div class="col-7" style="margin-bottom:5px;">
-                    <input class="bg-dark text-light form-control form-control-warning" type="text" value="@category[0]" id="editCategoryZeroNew" name="categories" />
+                    <input class="bg-dark text-light form-control form-control-warning categoryNames" type="text" value="@category[0]" id="editCategoryZeroNew" name="categories" />
                 </div>
                 <div class="col-4" style="margin-bottom:5px;">
                     <select style="background-color:@category[2];" class="form-control-sm form-control-warning categorySelectors" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor" id="category-color-picker" name="colors">
@@ -1165,6 +1165,7 @@ else
             inp.classList.add('form-control-warning');
             inp.classList.add('bg-dark');
             inp.classList.add('text-light');
+            inp.classList.add('categoryNames');
             inp.placeholder = '';
             inp.value = '';
             inp.name = 'categories';
@@ -1203,6 +1204,7 @@ else
 
         function checkTree() {
             var selectors = document.categoryEditForm.getElementsByClassName("categorySelectors");
+            var names = document.categoryEditForm.getElementsByClassName("categoryNames");
             var colors = [];
             for (var i = 0; i < selectors.length; i++) {
                 if (colors.includes(selectors[i].value)) {
@@ -1211,6 +1213,12 @@ else
                 }
                 else {
                     colors.push(selectors[i].value);
+                }
+            }
+            for (var j = 0; j < names.length; j++) {
+                if (names[j].value == "") {
+                    alert("Please supply a category name for each row added.");
+                    return false;
                 }
             }
             document.categoryEditForm.submit();
@@ -1233,7 +1241,7 @@ else
                     <span style="margin-top:8px; float: left; cursor:pointer;" onclick="removeCategory2(this);" class="material-icons"><a>delete</a></span>
                 </div>
             <div class="col-7" style="margin-bottom:5px;">
-                <input class="bg-dark text-light form-control form-control-warning" type="text" value="@category[0]" id="editCategoryZeroNew" name="categories" />
+                <input class="bg-dark text-light form-control form-control-warning categoryNames" type="text" value="@category[0]" id="editCategoryZeroNew" name="categories" />
             </div>
             <div class="col-4" style="margin-bottom:5px;">
                 <select style="background-color:@category[2];" class="form-control-sm form-control-warning categorySelectors" onchange="this.style.backgroundColor = this.selectedOptions[0].style.backgroundColor" id="category-color-picker" name="colors">

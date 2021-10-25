@@ -126,7 +126,7 @@
                         <label for="name-text">Import From Template</label>
                         <input type="text" placeholder="FILTER" class="bg-dark text-light form-control form-control-success" id="filterInput" onkeyup="filterImport()" style="float:right;" />
                         <br /><br />
-                        <select size="10" style="width: 100%;" class="form-control form-control-success bg-dark text-light" id="importList" name="steplateId">
+                        <select required size="10" style="width: 100%;" class="form-control form-control-success bg-dark text-light" id="importList" name="steplateId">
                             @{ foreach (var steplate in ViewBag.steplates)
                                             {
                                 <option value="@steplate.Id">@steplate.Event</option> } }

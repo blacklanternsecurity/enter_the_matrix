@@ -155,13 +155,21 @@
                     <div class="col-2 named-element left-column">MITIGATION</div>
                     <div class="col-4 other-column">@step.Mitigation</div>
                     <div class="col-3 named-element other-column">SEVERITY AND PERVASIVENESS</div>
-                    <div class="col-3 other-column">@step.Severity</div>
+                    <div class="col-3 other-column">
+                        @{
+                            int severityAndPervasiveness = 0;
+                            if (step.Severity == 0) { severityAndPervasiveness = step.Pervasiveness; }
+                            else if (step.Pervasiveness == 0) { severityAndPervasiveness = step.Severity; }
+                            else { severityAndPervasiveness = (int)Math.Max(step.Severity, step.Pervasiveness); }
+                            <div class="col-3 other-column">@severityAndPervasiveness</div>
+                        }
+                    </div>
                 </div>
             </div>
-                stepCounter++;
-            }
-            scenarioCounter++;
-        }
+                                    stepCounter++;
+                                }
+                                scenarioCounter++;
+                            }
         }
 </body>
 </html>
