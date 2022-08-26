@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,8 +17,11 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
         public Relevance()
         {
+            methodology = new HtmlString("Apply the value that most fits the descriptions provided below.");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Confirmed", "The threat event or TTP has been seen by the organization.");
             nistDescriptions.Add("Expected", "The threat event or TTP has been seen by the organization’s peers or partners.");

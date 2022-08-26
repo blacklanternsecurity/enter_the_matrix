@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     10-15-2020
-# Copyright:   (c) BLS OPS LLC. 2020
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,8 +17,11 @@ namespace Enter_The_Matrix.FactorModels
     {
         public string[,] matrix { get; set; }
         public Dictionary<string, string> nistDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
         public Risk()
         {
+            methodology = new HtmlString("This is determined for you. It is calculated based on the Overall Likelihood and Level of Impact. It is important to understand that just because something has a high Level of Impact, it does not mean that the Risk is high. If there is a moderate chance of the attacker executing the scenario, but there are many proactive controls in place, even a high impact event is considered low risk. For example: <ul><li>Likelihood of Attack Initiation: 5</li><li>Likelihood of Adverse Impact: 2</li><li>Overall Likelihood (Calculated): Low</li><li>Level of Impact: 9</li><li>Risk (Calculated): Low</li></ul>");
+
             // Handles calculating the over risk factor, taking into account the level of impact
             // as well as the overall likelihood of attack and adverse impacts
 

@@ -2,8 +2,8 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     10-15-2020
-# Copyright:   (c) BLS OPS LLC. 2020
+# Updated:     08-23-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
@@ -18,7 +18,7 @@ using MongoDB.Bson;
 
 namespace Enter_The_Matrix.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AssessmentsController : ControllerBase
     {
@@ -32,14 +32,12 @@ namespace Enter_The_Matrix.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Assessments>>> GetAll()
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             var assessments = await _assessmentsService.GetAllAsync();
             return Ok(assessments);
         }
 
         public async Task<ActionResult<Assessments>> GetById(string id)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             var assessment = await _assessmentsService.GetByIdAsync(id);
             if (assessment == null)
             {
@@ -51,7 +49,6 @@ namespace Enter_The_Matrix.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Assessments assessment)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             if (!ModelState.IsValid)
             {
                 return BadRequest();
@@ -63,7 +60,6 @@ namespace Enter_The_Matrix.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(string id, Assessments assessment)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             if (!ModelState.IsValid)
             {
                 return BadRequest();
@@ -82,7 +78,6 @@ namespace Enter_The_Matrix.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(string id)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             var assessment = await _assessmentsService.GetByIdAsync(id);
             if (assessment == null)
             {

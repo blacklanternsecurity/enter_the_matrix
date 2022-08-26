@@ -68,7 +68,7 @@ namespace Enter_The_Matrix.Controllers
             }
             else
             {
-                return Unauthorized();
+                return RedirectToAction("Main", "Home");
             }
         }
 
@@ -129,12 +129,8 @@ namespace Enter_The_Matrix.Controllers
                     new ClaimsPrincipal(claimsIdentity),
                     authProperties);
 
-                return RedirectToAction("Main", "Home");
             }
-            else
-            {
-                return Unauthorized();
-            }
+            return RedirectToAction("Main", "Home");
         }
 
         public async Task<IActionResult> Logout()

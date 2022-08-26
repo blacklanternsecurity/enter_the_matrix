@@ -1,7 +1,3 @@
-# BSides Augusta 2021
-
-[![ETM - BSidesAugusta2021](https://img.youtube.com/vi/kDKyXeqeX9c/0.jpg)](https://www.youtube.com/watch?v=kDKyXeqeX9c)
-
 # Table of Contents
 
    * [Deploying ETM](#deploying-etm)
@@ -14,6 +10,7 @@
       * [Setting up your environment](#setting-up-your-environment)
          * [Creating directories](#creating-directories)
          * [Clone ETM](#clone-etm)
+            * [Fatal error about certificate verification](#fatal-error-about-certificate-verification)
          * [Edit docker-compose.yaml](#edit-docker-composeyaml)
          * [Edit AppSettings.JSON](#edit-appsettingsjson)
          * [SSL Certificate](#ssl-certificate)
@@ -44,14 +41,18 @@
       * [Exporting Threat Matrix Spreadsheet](#exporting-threat-matrix-spreadsheet)
       * [Exporting Threat Matrix PDF](#exporting-threat-matrix-pdf)
       * [Creating Threat Trees](#creating-threat-trees)
+   * [Methodologies](#methodologies)
+      * [Simple Threat Source](#simple-threat-source)
+      * [Dynamic Threat Source](#dynamic-threat-source)
+      * [<Insert Threat Source Methodology> and Sophisticated Intel](#insert-threat-source-methodology-and-sophisticated-intel)
 
 # Deploying ETM
 
-This installation guide has been tested on fresh installs of Ubuntu 18.04 and 20.04.
+This guide is for installing ETM on a fresh install of Ubuntu 18.04.
 
 ## Installing Dependencies
 
-ETM is written with .NET Core, and is designed to run on Linux systems.
+ETM is written with .NET Core, so it is compatible with Linux systems.
 ETM also is designed to work within Docker containers.
 
 ### Update
@@ -108,42 +109,22 @@ ETM also is designed to work within Docker containers.
 * Replace the "Ldap" fields with your LDAP configuration
 * Replace the "LocalAuthSettings" with your desired administrative account credentials
 
+### Edit LdapAuthenticationService.cs
+
+* `cd /var/matrix/app/enter_the_matrix/Services`
+* `vim LdapAuthenticationService.cs`
+* Alter line `61` and replace `OU=YOURORG,DC=REPLACEME,DC=ANDME` with the appropriate information for your organization
+
 ### SSL Certificate
 
 * Place your SSL certificate at `/var/matrix/app/enter_the_matrix/matrix.cer`
 * Place your SSL key at `/var/matrix/app/enter_the_matrix/matrix.key`
-* To create your own self-signed certificate and key:
-  + `sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout matrix.key -out matrix.cer`
 
 ### Nginx Config
-
-* Alter `enter_the_matrix.conf` and replace `YOURDOMAIN` with your domain if you are using one
 
 For whatever reason the nginx configuration does not play nicely coming from a Windows development environment even when specifically telling GIT to convert to LF end-of-line format. So, do the following:
 
 * `dos2unix /var/matrix/app/enter_the_matrix/enter_the_matrix.conf`
-
-## Build
-
-### .NET SDK
-
-If you are using Ubuntu 18.04:
-
-* `wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb`
-
-Ubuntu 20.04:
-
-* `wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb`
-
-* `sudo dpkg -i packages-microsoft-prod.deb`
-* `sudo apt-get install -y apt-transport-https`
-* `sudo apt-get update`
-* `sudo apt-get install -y dotnet-sdk-5.0`
-
-### Build the project
-
-* `sudo cd /var/matrix/app/enter_the_matrix`
-* `sudo dotnet publish --configuration Release`
 
 ## Deploy
 
@@ -336,9 +317,142 @@ The section titled "Which techniques lead to TXXXX?" is where the edges are conn
 
 Once the user finishes applying the desired settings, an exported threat tree might look similar to the above example.
 
+# Methodologies
+
+From our internal operations, we have functionally defined three methods for creating a threat narrative or scenario. They are listed here for consideration and discussion purposes. To understand the divergence of Simple/Dynamic Threat Source methodology, you will need to familiarize with [NIST SP-800-30r1](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-30r1.pdf):
+
+![Description of Threat Sources](readme-images/methodology-1.PNG)
+![Threat Sources](readme-images/methodology-2.PNG)
+![Threat Source Characteristics](readme-images/methodology-3.PNG)
+
+The vagueness of the definitions provided by NIST allow for an organization to interpret the information in whatever way best suits the organization within certain limits. 
+
+## Simple Threat Source
+
+The logical order for creating a scenario in the simplest way for less-seasoned operators is as follows:
+
+1. Develop what the scenario is
+   - Each event in the scenario should be able to be tied to a MITRE ATT&CK Technique
+      - There are some exceptions. In these cases, it is helpful to bundle two events together
+      - Example of exception:
+         - `<impact>`: Attacker takes out 'shorts' against company stock (No MITRE coverage)
+      - Example of how to bundle:
+         - `<impact>`: Attacker leaks internal corporate financials and benefits financially by taking out 'shorts' against company stock ([Exfiltration Over C2 Channel - T1041](https://attack.mitre.org/techniques/T1041/))
+   - Begin with `<initial access>`
+   - `<Intermediate steps>`...
+   - End with `<impact>`
+1. Choose your threat source
+   1. Who is this?
+      - Individual
+      - Group
+      - Nation State/State Sponsored
+   1. What are their capabilities? (C)
+      - Individuals typically have a `[0-4]`
+      - Groups typically have a `[5-7]`
+      - Nation State/State Sponsored typically have a `[8-10]`
+      - Capabilities consit of
+         - Financing: Are they financed
+         - Knowledge: What is their background/training
+         - Infrastructure: Physical assets (cloud, server farms, computing power)
+         - Time (Man-power, number of able bodies)
+   1. What are their intents? (I)
+      - This largely depends on how you are personifying your threat source
+         - Are they motivated by boredom, the lulz, taking out aggression on the world and aren't really concerned about being detected? `[0-4]`
+         - Are they motivated by financial gains and care a little about being detected? `[5-7]`
+         - Are they very specific in what they want (incriminating evidence, leverage over a person) and are very careful about being detected? `[8-10]`
+         - Some intents:
+            - Financial Gain
+            - Defacement, Destruction, Boredom
+            - Political Activism
+   1. How do they choose targets? (T)
+      - Randomly or broadly scaled typically falls within `[0-4]`
+         - Spray and pray, hot new CVE, mass phishing campaign using OSINT
+      - Certain market verticals would typically be between `[5-7]`
+         - They target banks/financial institutions using OSINT
+      - Certain organization would be between `[8-10]`
+         - They only target a certain corporation/organization using OSINT and information from past attacks
+1. Now you should have the following items filled in all events
+   - MITRE ATT&CK Technique
+   - Event Description
+   - Threat Source
+      - Capability
+      - Intent
+      - Targeting
+1. The next step is to decide how likely your threat source is to execute your scenario.
+   - It is important to understand that any threat source can be placed in a scenario. 
+   - The likelihood of them attempting that scenario should change based on the threat source and the scenario. 
+   - This will affect the overall risk of what you are constructing.
+   - Some examples:
+      - A low C:I:T individual is unlikely to ninja their way into a government facility to thermite critical infrastructure
+      - A high C:I:T nation state is unlikely to make itself known just to cause a small network outage at a random corporation 
+      - A high C:I:T state sponsored organization is very likely to execute a carefully thought out attack to exfiltrate intellectual property
+      - A low C:I:T organized group is very likely to deface political organizations based on ideology
+   - You should now have Likelihood for Attack Initiation filled out for all events in the scenario
+1. At this point, you have taken care of the factors that should be consistent across the entire scenario.
+   - The following steps will need to be done while taking into consideration each particular event
+1. Event Relevance
+   - Apply the value that most fits the descriptions in ETM
+1. Finding Reference
+   - If there was a finding or findings discovered that is/are being reported on and it/they pertain/s to this event directly
+   - Vulnerability Severity
+      - This is only used if there is a Finding Reference
+      - This should mirror the CVSS score of the finding, for example:
+         - Finding Reference: `[T001]` Big-Bad-CVE (had a CVSS of 9.8)
+         - Vulnerability Severity: 9
+      - In the case of multiple findings, use the most sever as the severity value
+1. Predisposing Condition
+   - This is something that is not necessarily technical, but is considered an issue
+   - Pervasiveness of Predisposing Conditions
+      - This is only used if there is a Predisposing Condition
+      - This should mirror the DREAD score or use best judgement to how widespread the issue is
+         - Guidance is given within ETM
+   - Example
+      - Predisposing Condition: IT/Admin workstations were found unlocked and signed in during the assessment
+      - Pervasiveness of Predisposing Conditions: This could be a company wide policy enforcement or training issue (High `[8-9]`)
+1. Mitigation Observed
+   - Can be one or more mitigations that directly affected or would affect the success of the event from happening
+   - Should be considered Proactive Findings
+1. Likelihood of Adverse Impact
+   - You will need to take into account the previous 4 factors (Mitigation, Predisposing Conditions, Finding Reference, Event Relevance)
+   - Based on those items, how likely is the adverse impact of this event to happen, however severe it is?
+   - Example:
+      - Event Description: Attacker lands C2 shell via phish
+      - Finding Reference: `[None]`
+      - Predisposing Condition: `[None]`
+      - Mitigation Observed: Advanced email filtering (emails did not get through), Advanced EDR (binaries were blocked from executing), Advanced GPO (macros disabled in envrionment)
+      - Likelihood of Adverse Impact: Low (There is always a chance of bypassing all these protections, but it is not likely)
+1. Overall Likelihood
+   - This is determined for you
+   - It is calculated based on the Likelihood of Attack Initiation and Likelihood of Adverse Impact
+1. Level of Impact
+   - This should be determined based on the event outcome
+   - You should **not** take into account any of the previous factors that you used when determining adverse impact likelihood
+   - This is solely describing the potential impact of the event occuring
+   - Example
+      - Event Description: Attacker deploys ransomware to entire corporate domain
+      - Level of Impact: High (unlikely to destroy a business or kill someone, but still pretty bad)
+1. Risk
+   - This is determined for you
+   - It is calculated based on the Overall Likelihood and Level of Impact
+   - It is important to understand that just because something his a high Level of Impact, it does not mean that the Risk is high.
+   - If there is a moderate chance of the attacker executing the scenario, but there are many proactive controls in place, even a high impact event is considered low risk
+   - Example
+      - Likelihood of Attack Initiation: 5
+      - Likelihood of Adverse Impact: 2
+      - Overall Likelihood (Calculated): Low
+      - Level of Impact: 9
+      - Risk (Calculated): Low
+
+## Dynamic Threat Source
+
+This follows in much the same way as the Simple Threat Source methodology, except the idea is that the threat source's characteristics (C:I:T) evolve as the scenario plays out. Capability and Intent would be largely static, however may change in certain edge cases. Targeting would change as "threads are pulled" within the victim environment. Additionally, the likelihood for attack initiation would depend on the event and the current C:I:T of the threat source.
+
+## `<Insert Threat Source Methodology>` and Sophisticated Intel
+
+Uses either Simple or Dynamic Threat Source concepts. Additionally, takes into account information from threat intel sources including tracked adversaries (groups, APTs, etc), their C:I:T, and the TTPs they have been observed using. This would affect C:I:T (either throughout the scenario `[Simple]`, or as the base value `[Dynamic]`), and the likelihood for attack initiation. In this case, likelihood for attack initiation would change depending on whether the threat source had been observed performing this particular TTP, or a similar TTP. Also, likelihood for attack initiation would be based on the target organization and the adversary's typical targets of choice.
+
 # References
 
 * https://github.com/blacklanternsecurity/writehat
 * https://csrc.nist.gov/News/2012/NIST-Special-Publication-800-30-Revision-1
 * https://attack.mitre.org/
-* https://collaborate.mitre.org/attackics/index.php/Main_Page

@@ -2,18 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     10-15-2020
-# Copyright:   (c) BLS OPS LLC. 2020
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -22,8 +18,11 @@ namespace Enter_The_Matrix.FactorModels
         public List<string> sources { get; set; }
         public string nistDescription { get; set; }
         public string blsDescription { get; set; }
+        public HtmlString methodology { get; set; }
         public ThreatSources()
         {
+            methodology = new HtmlString("Choose the threat source you are modeling. This basically falls into one of individual, group, or nation state.");
+
             sources = new List<string>();
             // Per NIST guidelines:
             sources.Add("Insider");

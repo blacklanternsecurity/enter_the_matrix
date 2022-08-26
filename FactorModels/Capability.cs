@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,8 +17,11 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
         public Capability()
         {
+            methodology = new HtmlString("What are your threat source's capabilities?<ul><li>Capabilities consist of:<ul><li>Financing (are they financed)</li><li>Knowledge (what is their background/training)</li><li>Infrastructure (physical assets - cloud, server farms, computing power)</li><li>Time (number of able bodies and their time allotted)</li></ul></li><li>For example:<ul><li>Individuals [0-4]</li><li>Groups [5-7]</li><li>Nation State/State Sponsored [8-10]</li></ul></li></ul>");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Very High", @"The adversary has a very sophisticated level of expertise, is well-resourced, and can generate
                 opportunities to support multiple successful, continuous, and coordinated attacks");

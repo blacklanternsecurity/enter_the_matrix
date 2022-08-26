@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,9 +17,12 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
 
         public Severity()
         {
+            methodology = new HtmlString("This is only used if there is a finding reference. This should mirror the CVSS score of the finding. In the case of multiple findings, use the most severe as the severity value. For example: <ul><li>Finding Reference: [T001] Big Bad CVE (had a CVSS of 9.8)</li><li>Vulnerability Severity: 9</li></ul>");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Very High", @"The vulnerability is exposed and exploitable, and its exploitation could result in severe impacts.
                 Relevant security control or other remediation is not implemented and not planned; or no security

@@ -58,7 +58,7 @@ namespace Enter_The_Matrix
 
                 string filter = "sAMAccountname=" + userName;
                 
-                string baseStr = "OU=BLS,DC=blacklanternsecurity,DC=com";
+                string baseStr = "OU=YOURORG,DC=REPLACEME,DC=ANDME";
 
                 LdapSearchResults result = (LdapSearchResults)cn.Search(baseStr, LdapConnection.ScopeSub, filter, null, false);
 

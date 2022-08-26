@@ -2,8 +2,8 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     10-15-2020
-# Copyright:   (c) BLS OPS LLC. 2020
+# Updated:     08-23-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
@@ -62,7 +62,9 @@ namespace Enter_The_Matrix
             services.AddScoped<StepsService>();
             services.AddScoped<SteplatesService>();
             services.AddScoped<TreeService>();
-
+            services.AddScoped<MetricsService>();
+            services.AddScoped<KeyService>();
+            
             // Auth Cookies
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
@@ -120,9 +122,16 @@ namespace Enter_The_Matrix
             // LDAP Authorization
             app.UseAuthorization();
 
+            // API Authorization
+            app.UseWhen(context => context.Request.Path.StartsWithSegments("/api"), appBuilder =>
+            {
+                appBuilder.UseMiddleware<ApiAuthorizationService>();
+            });
+
             // Cookie Authentication
             app.UseCookiePolicy();
             app.UseAuthentication();
+
 
             app.UseEndpoints(endpoints =>
             {

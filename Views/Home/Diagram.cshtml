@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
@@ -13,15 +13,51 @@
     ViewData["Title"] = "Graph"; }
 
 <!--<script src="~/js/d3.min.js"></script>-->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+<link crossorigin="anonymous" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
       rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
 <script src="~/js/saveSvgAsPng.js"></script>
 <!--<button onclick="window.history.back();">BACK</button>-->
 <button onclick="saveSvgAsPng(document.getElementById('theSVG'), '@Model.Name' + '.png');">SAVE <span class="material-icons-outlined">save</span></button>
 <button onclick="copyMarkdown()">MARKDOWN <span class="material-icons-outlined">content_paste</span></button>
 <button onclick="blackWhite()">BLACK<span class="material-icons-outlined">swap_horizontal_circle</span>WHITE</button>
+
+<span id="grid-control-outer" class="grid-control">
+    <input type="checkbox" id="grid-enabled" onchange="gridToggled()"></input>
+    <label for="grid-enabled">Snap nodes to grid</label>
+    <span id="grid-control-inner" class="grid-control hidden">
+        <input type="range" id="grid-size" min="0" max="100"  step="10" value="10" onchange="gridChanged()"></input>
+        <label for="grid-size" id="grid-size-display"></label>
+    </span>
+</span>
+
+
 <style>
+
+    span.grid-control {
+        display: inline-flex;
+    }
+
+    span.grid-control .hidden {
+        display: none;
+    }
+
+    span#grid-control-outer {
+        background-color: rgb(239, 239, 239);
+        border: 1px solid rgb(118, 118, 118);
+        border-radius: 2.5px;
+        padding: 6px;
+        margin: 0 1rem 4px 0 0;
+        font-family: "Arial";
+        font-size: 13.33px;
+        line-height: 1.2rem;
+        border-collapse: collapse;
+        vertical-align: top;
+    }
+
+    span#grid-control-inner > input {
+        margin: 1px;
+    }
 
     .link {
         stroke: #000;
@@ -85,6 +121,7 @@
 </style>
 <div></div>
 <script>
+    var gridSize = 0, gridEnable = true;
 
     var width = 0.95 * window.innerWidth,
         height = 0.95 * window.innerHeight;
@@ -96,7 +133,8 @@
         .on("tick", tick);
 
     var drag = force.drag()
-        .on("dragstart", dragstart);
+        .on("dragstart", dragstart)
+        .on("dragend", dragend);
 
     var svg = d3.select("div").append("svg")
         .attr("id", "theSVG")
@@ -308,6 +346,14 @@
         d3.select(this).classed("fixed", d.fixed = true);
     }
 
+    function dragend(d) {
+        if (gridEnable === true && gridSize && gridSize > 0) {
+            d.fixed = true;
+            d.x = d.px = Math.round(d.x / gridSize) * gridSize;
+            d.y = d.py = Math.round(d.y / gridSize) * gridSize;
+        }
+    }
+
     function wrap(text, width) {
         text.each(function () {
             //console.log(d3.select(this).text());
@@ -378,6 +424,37 @@
         }
 
     }
+
+    function gridToggled() {
+        gridEnable = document.getElementById("grid-enabled").checked;
+        if (gridEnable) {
+            console.log(`Grid enabled (size: ${gridSize})`);
+            document.getElementById("grid-control-inner").classList.remove("hidden");
+        } else {
+            console.log("Grid disabled");
+            document.getElementById("grid-control-inner").classList.add("hidden");
+        }
+        localStorage.setItem('gridEnable', gridEnable);
+    }
+
+    function gridChanged() {
+        gridSize = document.getElementById("grid-size").value;
+        document.getElementById("grid-size-display").innerHTML = `${gridSize} px`;
+        localStorage.setItem("gridSize", gridSize);
+    }
+
+    function initGrid() {
+        gridEnable = localStorage.getItem('gridEnable');
+        if (gridEnable === "true") { 
+            document.getElementById("grid-enabled").checked = true;
+            gridToggled();
+        }
+        gridSize = localStorage.getItem("gridSize");
+        document.getElementById("grid-size").value = gridSize;
+        gridChanged();
+    }
+
+    initGrid();
 </script>
 
 <pre id="markdown-table" style="display:none;">

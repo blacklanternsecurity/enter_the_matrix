@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,9 +17,13 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
+
 
         public Initiation()
         {
+            methodology = new HtmlString("This decides how likely your threat source is to execute your scenario. It is important to understand that any threat source can be placed in a scenario. The likelihood of them attempting that scenario should change based on the threat source and the scenario. This will affect the overall risk of what you are constructing. Some examples: <ul><li>A low C:I:T individual is unlikely to ninja their way into a government facility to thermite critical infrastructure.</li><li>A high C:I:T nation state is unlikely to make itself known just to cause a small network outage at a random corporation.</li><li>A high C:I:T state sponsored organization is very likely to execute a carefully thought out attack to exfiltrate intellectual property.</li><li>A low C:I:T organized group is very likely to deface political organizations based on ideology.</li></ul>");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Very High", "Adversary is almost certain to initiate the threat event.");
             nistDescriptions.Add("High", "Adversary is highly likely to initiate the threat event.");

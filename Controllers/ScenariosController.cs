@@ -2,8 +2,8 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     10-15-2020
-# Copyright:   (c) BLS OPS LLC. 2020
+# Updated:     08-23-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Enter_The_Matrix.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ScenariosController : ControllerBase
     {
@@ -30,14 +30,12 @@ namespace Enter_The_Matrix.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Scenarios>>> GetAll()
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             var scenarios = await _scenariosService.GetAllAsync();
             return Ok(scenarios);
         }
 
         public async Task<ActionResult<Scenarios>> GetById(string id)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             var scenario = await _scenariosService.GetByIdAsync(id);
             if (scenario == null)
             {
@@ -49,7 +47,6 @@ namespace Enter_The_Matrix.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Scenarios scenario)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             if (!ModelState.IsValid)
             {
                 return BadRequest();
@@ -62,7 +59,6 @@ namespace Enter_The_Matrix.Controllers
         [HttpPut]
         public async Task<IActionResult> Update(string id, Scenarios scenario)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             if (!ModelState.IsValid)
             {
                 return BadRequest();
@@ -81,7 +77,6 @@ namespace Enter_The_Matrix.Controllers
         [HttpDelete]
         public async Task<IActionResult> Delete(string id)
         {
-            if (!User.Identity.IsAuthenticated) { return Unauthorized(); }
             var scenario = await _scenariosService.GetByIdAsync(id);
             if (scenario == null)
             {

@@ -51,13 +51,7 @@
             </ul>
         </div>
         <div class="d-flex justify-content-between align-items-center">
-            @{ var dat = new Dictionary<string, string>
-                                    {
-                        { "assessmentId", Model.assessment.Id }
-                    };
-                <a asp-controller="Home" asp-action="Scenarios" asp-all-route-data="@dat">
-                    <button type="button" class="btn-neon-green">SCENARIOS</button>
-                </a> }
+            
             @{ var dat2 = new Dictionary<string, string>
                                     {
                         { "scenarioId", Model.scenario.Id }

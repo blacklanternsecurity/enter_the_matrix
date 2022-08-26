@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,9 +17,12 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
 
         public Pervasiveness()
         {
+            methodology = new HtmlString("This is only used if there is a predisposing condition. This should mirror the DREAD score or use best judgement to how widespread the issue is. For example: <ul><li>Pervasiveness of Predisposing Conditions: This could be a company wide policy enforcement or training issue (High [8-9])</li></ul>");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Very High", @"Applies to all organizational missions/business functions (Tier 1), mission/business processes
                 (Tier 2), or information systems (Tier 3).");
