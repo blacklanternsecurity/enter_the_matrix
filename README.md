@@ -1,3 +1,7 @@
+# BSides Augusta 2021
+
+[![ETM - BSidesAugusta2021](https://img.youtube.com/vi/kDKyXeqeX9c/0.jpg)](https://www.youtube.com/watch?v=kDKyXeqeX9c)
+
 # Table of Contents
 
    * [Deploying ETM](#deploying-etm)
@@ -6,15 +10,17 @@
          * [Install Vim](#install-vim)
          * [Install GIT](#install-git)
          * [Install DOS2Unix](#install-dos2unix)
-         * [Instal Docker Engine](#instal-docker-engine)
+         * [Instal Docker Engine](#install-docker-engine)
       * [Setting up your environment](#setting-up-your-environment)
          * [Creating directories](#creating-directories)
          * [Clone ETM](#clone-etm)
-            * [Fatal error about certificate verification](#fatal-error-about-certificate-verification)
          * [Edit docker-compose.yaml](#edit-docker-composeyaml)
          * [Edit AppSettings.JSON](#edit-appsettingsjson)
          * [SSL Certificate](#ssl-certificate)
          * [Nginx Config](#nginx-config)
+      * [Build](#build)
+         * [.NET SDK](#net-sdk)
+         * [Build the Project](#build-the-project)
       * [Deploy](#deploy)
    * [ETM Usage](#etm-usage)
       * [Creating Users](#creating-users)
@@ -35,8 +41,8 @@
             * [Entity](#entity)
             * [Description](#description)
             * [Preceded By](#preceded-by)
-      * [Creating a Template](#creating-a-Template)
-      * [Editing a Template](#editing-a-Template)
+      * [Creating a Template](#creating-a-template)
+      * [Editing a Template](#editing-a-template)
       * [Exporting Graphs](#exporting-graphs)
       * [Exporting Threat Matrix Spreadsheet](#exporting-threat-matrix-spreadsheet)
       * [Exporting Threat Matrix PDF](#exporting-threat-matrix-pdf)
@@ -48,11 +54,11 @@
 
 # Deploying ETM
 
-This guide is for installing ETM on a fresh install of Ubuntu 18.04.
+This installation guide has been tested on fresh installs of Ubuntu 18.04 and 20.04.
 
 ## Installing Dependencies
 
-ETM is written with .NET Core, so it is compatible with Linux systems.
+ETM is written with .NET Core, and is designed to run on Linux systems.
 ETM also is designed to work within Docker containers.
 
 ### Update
@@ -119,12 +125,38 @@ ETM also is designed to work within Docker containers.
 
 * Place your SSL certificate at `/var/matrix/app/enter_the_matrix/matrix.cer`
 * Place your SSL key at `/var/matrix/app/enter_the_matrix/matrix.key`
+* To create your own self-signed certificate and key:
+  + `sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout matrix.key -out matrix.cer`
 
 ### Nginx Config
+
+* Alter `enter_the_matrix.conf` and replace `YOURDOMAIN` with your domain if you are using one
 
 For whatever reason the nginx configuration does not play nicely coming from a Windows development environment even when specifically telling GIT to convert to LF end-of-line format. So, do the following:
 
 * `dos2unix /var/matrix/app/enter_the_matrix/enter_the_matrix.conf`
+
+## Build
+
+### .NET SDK
+
+If you are using Ubuntu 18.04:
+
+* `wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb`
+
+Ubuntu 20.04:
+
+* `wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb`
+
+* `sudo dpkg -i packages-microsoft-prod.deb`
+* `sudo apt-get install -y apt-transport-https`
+* `sudo apt-get update`
+* `sudo apt-get install -y dotnet-sdk-5.0`
+
+### Build the project
+
+* `sudo cd /var/matrix/app/enter_the_matrix`
+* `sudo dotnet publish --configuration Release`
 
 ## Deploy
 
