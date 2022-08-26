@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
@@ -30,7 +30,7 @@
     <link rel="apple-touch-icon" href="~/apple-touch-icon.png" />
     <link rel="icon" href="~/favicon.ico" />
     <link rel="manifest" href="~/manifest.json" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    <link crossorigin="anonymous" href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
 
 </head>
@@ -84,6 +84,65 @@
                                 } }
             </div>
         </nav>
+        @{ if (User.Identity.IsAuthenticated)
+            {
+                List<String> Actions = new List<String>();
+                Actions.Add("Assessments");
+                Actions.Add("Steplates");
+                Actions.Add("Scenarios");
+                Actions.Add("Events");
+                Actions.Add("EditTree");
+                Actions.Add("EditEvent");
+                Actions.Add("EditSteplate");
+                <div class="breadcrumbs-container">
+
+                    @if (ViewContext.RouteData.Values["controller"].ToString() == "Home" && Actions.Contains(ViewContext.RouteData.Values["action"].ToString()))
+                    {
+                <span class="material-icons">
+                    chevron_right
+                </span>
+                                    @Html.ActionLink("Home", "Main", ViewContext.RouteData.Values["controller"].ToString());
+                                    Actions.Remove("Assessments");
+                                    Actions.Remove("Steplates");
+                                    Actions.Remove("EditSteplate");
+                                }
+                    @if (ViewContext.RouteData.Values["controller"].ToString() == "Home" && Actions.Contains(ViewContext.RouteData.Values["action"].ToString()))
+                    {
+                <span class="material-icons">
+                    chevron_right
+                </span>
+                                    @Html.ActionLink("Assessments", "Assessments", ViewContext.RouteData.Values["controller"].ToString());
+                                    Actions.Remove("Scenarios");
+                                }
+                    @if (ViewContext.RouteData.Values["controller"].ToString() == "Home" && Actions.Contains(ViewContext.RouteData.Values["action"].ToString()))
+                    {
+                <span class="material-icons">
+                    chevron_right
+                </span> String assessmentId = Context.Request.Query["assessmentId"].ToString();
+                @Html.ActionLink("Scenarios", "Scenarios", ViewContext.RouteData.Values["controller"].ToString(), new { assessmentId = assessmentId });
+                Actions.Remove("Events");
+                Actions.Remove("EditTree");
+            }
+                    @if (ViewContext.RouteData.Values["controller"].ToString() == "Home" && Actions.Contains(ViewContext.RouteData.Values["action"].ToString()))
+                    {
+                <span class="material-icons">
+                    chevron_right
+                </span> 
+                String assessmentId = Context.Request.Query["assessmentId"].ToString();
+                String scenarioId = Context.Request.Query["scenarioId"].ToString();
+                @Html.ActionLink("Events", "Events", ViewContext.RouteData.Values["controller"].ToString(), new { assessmentId = assessmentId, scenarioId = scenarioId });
+            }
+                    @if (ViewContext.RouteData.Values["controller"].ToString() == "Home" && ViewContext.RouteData.Values["action"].ToString() == "EditSteplate")
+                    {
+                <span class="material-icons">
+                    chevron_right
+                </span> 
+                String steplateId = Context.Request.Query["steplateId"].ToString();
+                @Html.ActionLink("Templates", "Steplates", ViewContext.RouteData.Values["controller"].ToString(), new { steplateId = steplateId });
+            }
+                </div>
+            }
+        }
     </header>
     <div class="container">
         <main role="main" class="pb-3">
@@ -94,6 +153,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/slide-menu.js"></script>
 
     @RenderSection("Scripts", required: false)
     <footer>

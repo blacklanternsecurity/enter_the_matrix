@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,9 +17,12 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
 
         public Impact()
         {
+            methodology = new HtmlString("This should be determined based on the event outcome. You should <b>not</b> take into account any of the previous factors that you used when determining adverse impact likelihood. This is soley describing the potential impact of the event occuring. For example: <ul><li>Event Description: Attacker deploys ransomware to entire corporate domain</li><li>Level of Impact: High (unlikely to destroy a business or kill someone, but still pretty bad)</li></ul>");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Very High", @"The threat event could be expected to have multiple severe or catastrophic adverse effects on
                 organizational operations, organizational assets, individuals, other organizations, or the Nation.");

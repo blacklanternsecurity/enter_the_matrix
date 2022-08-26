@@ -241,6 +241,10 @@ input[type=range].custom-range {
         margin-left: 15px;
     }
 
+    .form-check-input-mitre {
+        margin-right: 1vw;
+    }
+
     .form-control-success:focus {
         border-color: #4cff00;
         box-shadow: 0 0 0 0.2rem rgba(76, 255, 0, 0.25);
@@ -365,4 +369,87 @@ body {
 
 .modal-content {
     background-color: rgba(0,0,0,0.75);
+}
+
+.slide-menu {
+    max-width: 100%;
+    min-height: 25vh;
+    overflow: hidden;
+    box-sizing: border-box;
+    overflow-y: auto;
+    z-index: 1000;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #343a40;
+}
+
+    .slide-menu, .slide-menu .slide-menu__slider {
+        transition: transform .3s ease-in-out;
+        will-change: transform
+    }
+
+        .slide-menu .slide-menu__slider {
+            width: 100%;
+            transform: translateX(0)
+        }
+
+        .slide-menu ul {
+            position: relative;
+            width: 100%;
+            margin: 0;
+            padding-left: 0;
+            list-style: none
+        }
+
+            .slide-menu ul ul {
+                position: absolute;
+                top: 0;
+                left: 100%;
+                display: none
+            }
+
+            .slide-menu ul a {
+                margin-right: 0.5vw;
+            }
+
+            .slide-menu ul li {
+                padding-left: 0.5vw;
+                align-content: center;
+                display: flex;
+                margin-right: 1vw;
+                padding-top: 0.15vh;
+                padding-bottom: 0.15vh;
+            }
+
+        .slide-menu a {
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+.breadcrumbs-container{
+    display: flex;
+    align-content: center;
+    align-items: center;
+    margin-left: 22vw;
+    margin-bottom: 4vh;
+    max-width: 1140px;
+}
+
+    .breadcrumbs-container a{
+        margin-right: unset;
+    }
+
+.apiKey {
+    font-weight: bold;
+    color: red;
+    padding: 1vw;
+}
+
+.table thead {
+    font-weight: bold;
+}
+
+.factor-methodology {
+    border-bottom: 1px solid white;
+    margin-bottom: 2vh;
 }

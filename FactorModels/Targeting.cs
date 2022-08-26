@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,8 +17,11 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
         public Targeting()
         {
+            methodology = new HtmlString("How does your threat source choose their targets? <ul><li>Randomly or broadly scaled typically falls within [0-4]<ul><li>Spray and pray, hot new CVE, mass phishing campaign using OSINT</li></ul></li><li>Certain market verticals would typically be between [5-7]<ul><li>They target banks/financial institutions using OSINT</li></ul></li><li>Certain organization would be between [8-10]<ul><li>They only target a certain corporation/organization using OSINT and information from past attacks</li></ul></li></ul>");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Very High", @"The adversary analyzes information obtained via reconnaissance and attacks to target persistently
                 a specific organization, enterprise, program, mission or business function, focusing on specific

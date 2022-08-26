@@ -2,16 +2,14 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */
 
-using System;
+using Microsoft.AspNetCore.Html;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.FactorModels
 {
@@ -19,9 +17,12 @@ namespace Enter_The_Matrix.FactorModels
     {
         public Dictionary<string, string> nistDescriptions { get; set; }
         public Dictionary<string, string> blsDescriptions { get; set; }
+        public HtmlString methodology { get; set; }
 
         public Intent()
         {
+            methodology = new HtmlString("This largely depends on how you are personifying your threat source.<ul><li>Are they motivated by boredom, taking out aggression on the world, and aren't really concerned about being detected? [0-4]</li><li>Are they motivated by financial gains and care a little about being detected? [5-7]</li><li>Are they very specific in what they want (incriminating evidence, leverage over a person) and are very careful about being detected? [8-10]</li><li>Some intents: Financial Gain, Defacement, Destruction, Boredom, Political Activism</li></ul>");
+
             nistDescriptions = new Dictionary<string, string>();
             nistDescriptions.Add("Very High", @"The adversary seeks to undermine, severely impede, or destroy a core mission or business
                 function, program, or enterprise by exploiting a presence in the organization’s information systems

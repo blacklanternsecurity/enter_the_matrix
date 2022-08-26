@@ -2,8 +2,8 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     10-15-2020
-# Copyright:   (c) BLS OPS LLC. 2020
+# Created:     08-24-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 */

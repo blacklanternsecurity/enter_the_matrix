@@ -2,8 +2,8 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     06-07-2021
-# Copyright:   (c) BLS OPS LLC. 2021
+# Updated:     08-25-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 -->
@@ -452,6 +452,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.capabilities.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -480,6 +481,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.intents.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -488,12 +490,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.intents.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.intents.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.intents.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -508,6 +509,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.targetings.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -516,12 +518,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.targetings.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.targetings.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.targetings.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -536,6 +537,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.severities.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -544,12 +546,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.severities.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.severities.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.severities.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -564,6 +565,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.pervasivenesses.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -572,12 +574,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.pervasivenesses.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.pervasivenesses.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.pervasivenesses.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -592,6 +593,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.initiations.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -600,12 +602,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.initiations.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.initiations.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.initiations.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -620,6 +621,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.adverses.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -628,12 +630,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.adverses.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.adverses.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.adverses.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -648,6 +649,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.impacts.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -656,12 +658,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.impacts.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.impacts.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.impacts.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -677,6 +678,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.relevances.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -685,12 +687,11 @@
                     </tr>
                     @{ foreach (var entry in ViewBag.relevances.nistDescriptions)
                         {
-                            <tr>
-                                <td>@entry.Key</td>
-                                <td>@entry.Value</td>
-                                <td>@ViewBag.relevances.blsDescriptions[entry.Key]</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@entry.Key</td>
+                <td>@entry.Value</td>
+                <td>@ViewBag.relevances.blsDescriptions[entry.Key]</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -705,17 +706,17 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.sources.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>NIST 800-30 Description</th>
                         <th>BLS Description</th>
                     </tr>
                     @{
-                        <tr>
-                            <td>@ViewBag.sources.nistDescription</td>
-                            <td>@ViewBag.sources.blsDescription</td>
-                        </tr>
-                    }
+                                    <tr>
+                                        <td>@ViewBag.sources.nistDescription</td>
+                                        <td>@ViewBag.sources.blsDescription</td>
+                                    </tr> }
                 </table>
             </div>
             <div class="modal-footer">
@@ -730,15 +731,15 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.vulnerabilities.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>NIST 800-30 Description</th>
                     </tr>
                     @{
-                        <tr>
-                            <td>@ViewBag.vulnerabilities.nistDescription</td>
-                        </tr>
-                    }
+                                    <tr>
+                                        <td>@ViewBag.vulnerabilities.nistDescription</td>
+                                    </tr> }
                 </table>
             </div>
             <div class="modal-footer">
@@ -753,6 +754,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-body dialog-box_info">
+                <div class="factor-methodology">@ViewBag.risks.methodology</div>
                 <table class="table table-dark table-bordered">
                     <tr>
                         <th>Values</th>
@@ -760,11 +762,10 @@
                     </tr>
                     @{ foreach (var risk in ViewBag.risks.nistDescriptions)
                         {
-                            <tr>
-                                <td>@risk.Key</td>
-                                <td>@risk.Value</td>
-                            </tr>
-                        } }
+            <tr>
+                <td>@risk.Key</td>
+                <td>@risk.Value</td>
+            </tr> } }
                 </table>
             </div>
             <div class="modal-footer">
@@ -834,8 +835,8 @@
         }
 
         function mitreSearchFilter() {
-            var accordion = document.getElementById("accordion");
-            var sections = accordion.children;
+            var mitreMenu = document.getElementById("mitre-menu");
+            var sections = mitreMenu.children[0].children[0].children;
             var input = document.getElementById("mitreFilter");
             var filter = input.value.toUpperCase();
 
@@ -844,11 +845,11 @@
                 var inSection = false;
                 // iterate through the tactics
                 var tactics = sections[i].children[1].children;
-                for (var j = 0; j < tactics.length; j++) {
+                for (var j = 1; j < tactics.length; j++) {
                     var inTactic = false;
                     // iterate through the techniques
-                    var techniques = tactics[j].children[0].children[1].children;
-                    for (var k = 0; k < techniques.length; k++) {
+                    var techniques = tactics[j].children[1].children;
+                    for (var k = 1; k < techniques.length; k++) {
                         var inTechnique = false;
                         if (techniques[k].textContent.toUpperCase().indexOf(filter) > -1) {
                             techniques[k].style.display = "";

@@ -2,18 +2,17 @@
 # -------------------------------------------------------------------------------
 # Author:      Cody Martin <cody.martin@blacklanternsecurity.com>
 #
-# Created:     10-15-2020
-# Copyright:   (c) BLS OPS LLC. 2020
+# Created:     08-23-2022
+# Copyright:   (c) BLS OPS LLC. 2022
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 -->
-@model List<User>;
-@{
-    ViewData["Title"] = "Users";
-}
+@model (List<User>, List<Key>);
+@{ ViewData["Title"] = "Users"; }
 <div>
     <div class="d-flex justify-content-between align-items-center">
         <button type="button" class="btn-neon-green" data-toggle="modal" data-target="#createModal" id="new-assessment-btn">CREATE USER</button>
+        <button type="button" class="btn-neon-green" data-toggle="modal" data-target="#createKeyModal" id="new-assessment-btn">CREATE KEY</button>
     </div>
     <div class="dialog-box_success" data-title="User Management">
         <table class="table table-dark table-striped table-hover">
@@ -27,22 +26,46 @@
                 </tr>
             </thead>
             <tbody>
-                @{
-                    int row = 1;
-                    foreach (var user in Model)
+                @{ int row = 1;
+                    foreach (User user in Model.Item1)
                     {
                         string editId = "#editModal" + row.ToString();
                         string deleteId = "#deleteModal" + row.ToString();
-                        <tr>
-                            <td scope="row">@row</td>
-                            <td>@user.UserName</td>
-                            <td>@user.DisplayName</td>
-                            <td>@user.GivenName</td>
-                            <td><a href="#" data-toggle="modal" data-target="@editId">Edit</a>&nbsp;&nbsp;&nbsp;<a href="#" data-toggle="modal" data-target="@deleteId">Delete</a></td>
-                        </tr>
-                        row++;
-                    }
-                }
+        <tr>
+            <td scope="row">@row</td>
+            <td>@user.UserName</td>
+            <td>@user.DisplayName</td>
+            <td>@user.GivenName</td>
+            <td><a href="#" data-toggle="modal" data-target="@editId">Edit</a>&nbsp;&nbsp;&nbsp;<a href="#" data-toggle="modal" data-target="@deleteId">Delete</a></td>
+        </tr> row++;
+                    } }
+            </tbody>
+        </table>
+    </div>
+    <div class="dialog-box_success" data-title="Key Management">
+        <table class="table table-dark table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Privileges</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ row = 1;
+                    foreach (Key key in Model.Item2)
+                    {
+                        string deleteId = "#deleteKeyModal" + row.ToString();
+        <tr>
+            <td scope="row">@row</td>
+            <td>@key.Name</td>
+            <td>
+                A:@String.Join("", key.AssessmentPrivileges.ToArray());S:@String.Join("", key.ScenarioPrivileges.ToArray());E:@String.Join("", key.EventPrivileges.ToArray());T:@String.Join("", key.TemplatePrivileges.ToArray());M:@String.Join("", key.MetricsPrivileges.ToArray())
+            </td>
+            <td><a href="#" data-toggle="modal" data-target="@deleteId">Delete</a></td>
+        </tr> row++;
+                    } }
             </tbody>
         </table>
     </div>
@@ -83,78 +106,175 @@
     </div>
 </div>
 
-@{
-        int j = 1;
-        foreach (var user in Model)
-        {
-            string id = "deleteModal" + j.ToString();
-        <!-- Delete Modal -->
-        <div class="modal fade" id="@id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body dialog-box_error">
-                        <center>
-                            <p>Are you sure you want to delete this user?</p>
-                            <p>Changes cannot be undone.</p>
-                        </center>
+<!-- Create Key Modal -->
+<div class="modal fade" id="createKeyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_success">
+                <form>
+                    <div class="form-group">
+                        <label for="keyName">Name</label>
+                        <input type="text" class="form-control bg-dark text-light" id="keyName" required name="keyName" />
                     </div>
-                    <div class="modal-footer" style="border: none;">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <form asp-action="DeleteUser" asp-controller="AdminDashboard" method="post">
-                            <input name="username" type="hidden" value="@user.UserName" />
-                            <button type="submit" class="btn btn-danger">DELETE</button>
-                        </form>
-                    </div>
+
+                    <table class="table table-dark table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <td>Service</td>
+                                <td>Create</td>
+                                <td>Read</td>
+                                <td>Update</td>
+                                <td>Delete</td>
+                            </tr>
+                        </thead>
+                        <tr>
+                            <td>Assessments</td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="assessmentPrivC" value="C" name="assessmentPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="assessmentPrivR" value="R" name="assessmentPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="assessmentPrivU" value="U" name="assessmentPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="assessmentPrivD" value="D" name="assessmentPrivileges" /></td>
+                        </tr>
+                        <tr>
+                            <td>Scenarios</td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="scenarioPrivC" value="C" name="scenarioPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="scenarioPrivR" value="R" name="scenarioPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="scenarioPrivU" value="U" name="scenarioPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="scenarioPrivD" value="D" name="scenarioPrivileges" /></td>
+                        </tr>
+                        <tr>
+                            <td>Events</td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="eventPrivC" value="C" name="eventPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="eventPrivR" value="R" name="eventPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="eventPrivU" value="U" name="eventPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="eventPrivD" value="D" name="eventPrivileges" /></td>
+                        </tr>
+                        <tr>
+                            <td>Templates</td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="templatePrivC" value="C" name="templatePrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="templatePrivR" value="R" name="templatePrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="templatePrivU" value="U" name="templatePrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="templatePrivD" value="D" name="templatePrivileges" /></td>
+                        </tr>
+                        <tr>
+                            <td>Metrics</td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="metricsPrivC" value="C" name="metricsPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="metricsPrivR" value="R" name="metricsPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="metricsPrivU" value="U" name="metricsPrivileges" /></td>
+                            <td><input type="checkbox" class="form-check-inline bg-dark text-light" id="metricsPrivD" value="D" name="metricsPrivileges" /></td>
+                        </tr>
+                    </table>
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" onclick="createKey()" class="btn btn-success">CREATE</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="displayKeyModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body dialog-box_warning">
+                <div>Copy this key somewhere safe. It will not be possible to retrieve it again.</div>
+                <div class="apiKey" id="newKey"></div>
+                <div>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="location.reload()">Close</button>
                 </div>
             </div>
         </div>
-    }
-}
+    </div>
+</div>
 
-@{
-    int i = 1;
-    foreach (var user in Model)
-    {
-        string id = "editModal" + i.ToString();
-        string displayName = "displayName" + i.ToString();
-        string givenName = "givenName" + i.ToString();
-        string password = "password" + i.ToString();
-        string username = "username" + i.ToString();
-        <!-- Edit Modal -->
-        <div class="modal fade" id="@id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body dialog-box_success">
-                        <form asp-action="EditUser" asp-controller="AdminDashboard" method="post">
-                            <div class="form-group">
-                                <label for="@username">Username</label>
-                                <input type="text" class="form-control bg-dark text-light" id="@username" required name="username" placeholder="@user.UserName" readonly value="@user.UserName" />
-                            </div>
+                @{ int j = 1;
+                    foreach (var user in Model.Item1)
+                    {
+                        string id = "deleteModal" + j.ToString(); <!-- Delete Modal -->
+                                        <div class="modal fade" id="@id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-body dialog-box_error">
+                                                        <center>
+                                                            <p>Are you sure you want to delete this user?</p>
+                                                            <p>Changes cannot be undone.</p>
+                                                        </center>
+                                                    </div>
+                                                    <div class="modal-footer" style="border: none;">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                        <form asp-action="DeleteUser" asp-controller="AdminDashboard" method="post">
+                                                            <input name="username" type="hidden" value="@user.UserName" />
+                                                            <button type="submit" class="btn btn-danger">DELETE</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> j++; } }
 
-                            <div class="form-group">
-                                <label for="@displayName">Display Name</label>
-                                <input type="text" class="form-control bg-dark text-light" id="@displayName" required name="displayName" placeholder="@user.DisplayName" />
-                            </div>
+                @{ int k = 1;
+                    foreach (Key key in Model.Item2)
+                    {
+                        string id = "deleteKeyModal" + k.ToString(); <!-- Delete Key Modal -->
+                                        <div class="modal fade" id="@id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-body dialog-box_error">
+                                                        <center>
+                                                            <p>Are you sure you want to delete this key?</p>
+                                                            <p>Changes cannot be undone.</p>
+                                                        </center>
+                                                    </div>
+                                                    <div class="modal-footer" style="border: none;">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                        <form asp-action="DeleteKey" asp-controller="AdminDashboard" method="post">
+                                                            <input name="keyName" type="hidden" value="@key.Name" />
+                                                            <button type="submit" class="btn btn-danger">DELETE</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> k++;
+                    } }
 
-                            <div class="form-group">
-                                <label for="@givenName">Given Name</label>
-                                <input type="text" class="form-control bg-dark text-light" id="@givenName" required name="givenName" placeholder="@user.GivenName" />
-                            </div>
+                @{ int i = 1;
+                    foreach (var user in Model.Item1)
+                    {
+                        string id = "editModal" + i.ToString();
+                        string displayName = "displayName" + i.ToString();
+                        string givenName = "givenName" + i.ToString();
+                        string password = "password" + i.ToString();
+                        string username = "username" + i.ToString(); <!-- Edit Modal -->
+                                        <div class="modal fade" id="@id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-body dialog-box_success">
+                                                        <form asp-action="EditUser" asp-controller="AdminDashboard" method="post">
+                                                            <div class="form-group">
+                                                                <label for="@username">Username</label>
+                                                                <input type="text" class="form-control bg-dark text-light" id="@username" required name="username" placeholder="@user.UserName" readonly value="@user.UserName" />
+                                                            </div>
 
-                            <div class="form-group">
-                                <label for="@password">Password</label>
-                                <input type="password" class="form-control bg-dark text-light" id="@password" required name="password" />
-                            </div>
+                                                            <div class="form-group">
+                                                                <label for="@displayName">Display Name</label>
+                                                                <input type="text" class="form-control bg-dark text-light" id="@displayName" required name="displayName" placeholder="@user.DisplayName" />
+                                                            </div>
 
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-success">UPDATE</button>
+                                                            <div class="form-group">
+                                                                <label for="@givenName">Given Name</label>
+                                                                <input type="text" class="form-control bg-dark text-light" id="@givenName" required name="givenName" placeholder="@user.GivenName" />
+                                                            </div>
 
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        i++;
-    }
-}
+                                                            <div class="form-group">
+                                                                <label for="@password">Password</label>
+                                                                <input type="password" class="form-control bg-dark text-light" id="@password" required name="password" />
+                                                            </div>
 
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-success">UPDATE</button>
+
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> i++;
+                                    } }
