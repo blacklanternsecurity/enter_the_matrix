@@ -191,6 +191,8 @@ Selecting the "Delete" link next to each user will bring up a confirmation promp
 
 ## Creating an Assessment
 
+![Assessments_Page](readme-images/Assessments.png)
+
 Once you are logged in properly, navigate to "Assessments" and then click the "CREATE ASSESSMENT" button. Supply a title for the assessment you are creating and click "CREATE".
 
 ## Creating a Scenario
