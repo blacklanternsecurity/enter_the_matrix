@@ -23,10 +23,17 @@ namespace Enter_The_Matrix.Controllers
     public class AssessmentsController : ControllerBase
     {
         private readonly AssessmentsService _assessmentsService;
+        private readonly ScenariosService _scenariosService;
+        private readonly StepsService _stepsService;
 
-        public AssessmentsController(AssessmentsService service)
+        public AssessmentsController(
+            AssessmentsService assessmentService, 
+            ScenariosService scenarioService,
+            StepsService stepsService)
         {
-            _assessmentsService = service;
+            _assessmentsService = assessmentService;
+            _scenariosService = scenarioService;
+            _stepsService = stepsService;
         }
 
         [HttpGet]
@@ -36,55 +43,139 @@ namespace Enter_The_Matrix.Controllers
             return Ok(assessments);
         }
 
+        [HttpGet]
         public async Task<ActionResult<Assessments>> GetById(string id)
         {
-            var assessment = await _assessmentsService.GetByIdAsync(id);
+            Assessments assessment;
+            try
+            {
+                assessment = await _assessmentsService.GetByIdAsync(id);
+            }
+            catch
+            {
+                return BadRequest();
+            }
             if (assessment == null)
             {
-                return NotFound();
+                return NotFound("The assessment provided does not exist.");
             }
             return Ok(assessment);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Assessments assessment)
+        public async Task<IActionResult> Create([FromBody] Assessments assessment)
         {
             if (!ModelState.IsValid)
             {
+                return BadRequest("The model supplied is invalid.");
+            }
+            assessment.Id = null;
+            assessment.Scenarios = new string[] { };
+            assessment.ThreatTreeId = "";
+            try
+            {
+                await _assessmentsService.CreateAsync(assessment);
+            }
+            catch
+            {
                 return BadRequest();
             }
-            await _assessmentsService.CreateAsync(assessment);
+
             return Ok(assessment);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(string id, Assessments assessment)
+        public async Task<IActionResult> Update(string id, [FromBody] Assessments assessment)
         {
             if (!ModelState.IsValid)
+            {
+                return BadRequest("The model supplied is invalid.");
+            }
+
+            // Check if assessment exists
+            var queriedAssessment = await _assessmentsService.GetByIdAsync(id);
+            if (queriedAssessment == null)
+            {
+                return NotFound("The assessment supplied was not found.");
+            }
+
+            // Make sure that scenarios are unique (no duplicates)
+            if (assessment.Scenarios.Length != assessment.Scenarios.Distinct().ToArray<string>().Length)
+            {
+                return BadRequest("A scenario was supplied more than once.");
+            }
+
+            // Check if all scenarios exist
+            foreach (string scenarioId in assessment.Scenarios)
+            {
+                if (await _scenariosService.GetByIdAsync(scenarioId) == null)
+                {
+                    return NotFound("One of the scenarios supplied was not found.");
+                }
+            }
+
+            // Check that no scenario is already consumed by another assessment
+            List<Assessments> assessmentList = await _assessmentsService.GetAllAsync();
+            foreach (string scenarioId in assessment.Scenarios)
+            {
+                foreach (Assessments a in assessmentList)
+                {
+                    if (a.Id == id) { continue; }
+                    if (a.Scenarios.Contains(scenarioId)) {
+                        return BadRequest("One of the scenarios supplied is already associated with another assessment.");
+                    }
+                }
+            }
+
+
+            try
+            {
+                await _assessmentsService.UpdateAsync(id, assessment);
+            }
+            catch
             {
                 return BadRequest();
             }
 
-            var queriedAssessment = await _assessmentsService.GetByIdAsync(id);
-            if (queriedAssessment == null)
-            {
-                return NotFound();
-            }
-
-            await _assessmentsService.UpdateAsync(id, assessment);
-            return NoContent();
+            return Ok(await _assessmentsService.GetByIdAsync(id));
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete(string id)
         {
+            // Check if the assessment exists
             var assessment = await _assessmentsService.GetByIdAsync(id);
             if (assessment == null)
             {
-                return NotFound();
+                return NotFound("The assessment provided does not exist.");
             }
-            await _assessmentsService.DeleteAsync(id);
-            return NoContent();
+
+            // Take care of orphaned records
+            foreach (string scenarioId in assessment.Scenarios)
+            {
+                Scenarios scenario = await _scenariosService.GetByIdAsync(scenarioId);
+                if (scenario != null)
+                {
+                    foreach (string stepId in scenario.Steps)
+                    {
+                        Steps step = await _stepsService.GetByIdAsync(stepId);
+                        if (step != null)
+                        {
+                            await _stepsService.DeleteAsync(step.Id);
+                        }
+                    }
+                    await _scenariosService.DeleteAsync(scenario.Id);
+                }
+            }
+            try
+            {
+                await _assessmentsService.DeleteAsync(id);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+            return Ok();
         }
     }
 }

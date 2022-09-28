@@ -34,6 +34,7 @@ namespace Enter_The_Matrix.Controllers
             return Ok(steplates);
         }
 
+        [HttpGet]
         public async Task<ActionResult<Steplates>> GetById(string id)
         {
             var steplate = await _steplatesService.GetByIdAsync(id);
