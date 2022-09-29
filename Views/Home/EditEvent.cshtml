@@ -865,6 +865,9 @@
                 if (inSection) { sections[i].style.display = ""; }
                 else { sections[i].style.display = "none"; }
             }
+            let slideMenu = document.getElementById('mitre-menu')._slideMenu;
+            slideMenu.level = 1;
+            slideMenu.back();
         }
 
         document.onload(showThumbnail());
