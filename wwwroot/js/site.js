@@ -7,6 +7,9 @@ function createKey() {
     // Grabbing Key Name
     var keyName = document.getElementById("keyName").value;
 
+    // Grabbing the scoped assessment
+    var assessmentId = document.getElementById("assessmentScope").selectedOptions[0].value;
+
     // Grabbing Privilegegs
     var assessmentPrivileges = [];
     if (document.getElementById("assessmentPrivC").checked) { assessmentPrivileges.push(document.getElementById("assessmentPrivC").value); }
@@ -46,7 +49,8 @@ function createKey() {
             "scenarioPrivileges": scenarioPrivileges,
             "eventPrivileges": eventPrivileges,
             "templatePrivileges": templatePrivileges,
-            "metricsPrivileges": metricsPrivileges
+            "metricsPrivileges": metricsPrivileges,
+            "assessmentId": assessmentId
         },
         type: "POST",
         success: function (retKey) {

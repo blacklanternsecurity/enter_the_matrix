@@ -25,15 +25,18 @@ namespace Enter_The_Matrix.Controllers
         private readonly ILogger<AdminDashboardController> _logger;
         private readonly UsersService _usersService;
         private readonly KeyService _keyService;
+        private readonly AssessmentsService _assessmentsService;
 
         public AdminDashboardController(
             ILogger<AdminDashboardController> logger,
             UsersService usersService,
-            KeyService keyService)
+            KeyService keyService,
+            AssessmentsService assessmentsService)
         {
             _logger = logger;
             _usersService = usersService;
             _keyService = keyService;
+            _assessmentsService = assessmentsService;
         }
 
         [HttpGet]
@@ -47,8 +50,9 @@ namespace Enter_The_Matrix.Controllers
             // Display the dashboard
             List<User> users = await _usersService.GetUsers();
             List<Key> keys = await _keyService.GetKeys();
+            List<Assessments> assessments = await _assessmentsService.GetAllAsync();
 
-            return View((users, keys));
+            return View((users, keys, assessments));
         }
 
         [HttpPost]
@@ -67,11 +71,20 @@ namespace Enter_The_Matrix.Controllers
             List<string> scenarioPrivileges,
             List<string> eventPrivileges,
             List<string> templatePrivileges,
-            List<string> metricsPrivileges)
+            List<string> metricsPrivileges,
+            string assessmentId)
         {
             if (!User.Identity.IsAuthenticated || !User.IsInRole("Admin")) { return RedirectToAction("Logout", "Security"); }
 
-            string apiKey = await _keyService.AddKey(keyName, assessmentPrivileges, scenarioPrivileges, eventPrivileges, templatePrivileges, metricsPrivileges);
+            string apiKey = await _keyService.AddKey(
+                keyName, 
+                assessmentPrivileges, 
+                scenarioPrivileges, 
+                eventPrivileges, 
+                templatePrivileges, 
+                metricsPrivileges,
+                assessmentId
+            );
 
             return Content(JsonConvert.SerializeObject(apiKey));
         }

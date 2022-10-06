@@ -7,7 +7,7 @@
 # Licence:     GPL
 # -------------------------------------------------------------------------------
 -->
-@model (List<User>, List<Key>);
+@model (List<User>, List<Key>, List<Assessments>);
 @{ ViewData["Title"] = "Users"; }
 <div>
     <div class="d-flex justify-content-between align-items-center">
@@ -62,6 +62,8 @@
             <td>@key.Name</td>
             <td>
                 A:@String.Join("", key.AssessmentPrivileges.ToArray());S:@String.Join("", key.ScenarioPrivileges.ToArray());E:@String.Join("", key.EventPrivileges.ToArray());T:@String.Join("", key.TemplatePrivileges.ToArray());M:@String.Join("", key.MetricsPrivileges.ToArray())
+                <br />
+                Assessment:@key.AssessmentId
             </td>
             <td><a href="#" data-toggle="modal" data-target="@deleteId">Delete</a></td>
         </tr> row++;
@@ -115,6 +117,17 @@
                     <div class="form-group">
                         <label for="keyName">Name</label>
                         <input type="text" class="form-control bg-dark text-light" id="keyName" required name="keyName" />
+                        <label for="assessmentScope">Assessment Scope</label>
+                        <select class="form-control bg-dark text-light" id="assessmentScope" required name="assessmentscope">
+                            <option value=""></option>
+                            <option value="*">ALL</option>
+                            @{
+                                foreach (Assessments assessment in Model.Item3)
+                                {
+                                    <option value="@assessment.Id">@assessment.Name</option>
+                                }
+                            }
+                        </select>
                     </div>
 
                     <table class="table table-dark table-striped table-hover">
