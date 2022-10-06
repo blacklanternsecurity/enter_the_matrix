@@ -9,8 +9,7 @@ namespace Enter_The_Matrix.Services
     {
         private readonly RequestDelegate _next;
         private const string APIKEY = "X-Api-Key";
-        private readonly KeyService _keyService;
-
+        
         public ApiAuthorizationService(RequestDelegate next)
         {
             _next = next;
