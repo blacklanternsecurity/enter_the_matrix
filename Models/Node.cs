@@ -27,7 +27,7 @@ namespace Enter_The_Matrix.Models
 	{
 	    ParentId = new string[]{""};
             Id = "";
-	    EntityType = "person"
+	    EntityType = "person";
 	    EntityDescription = "";
 	    Risk = "Very Low";
 	}
