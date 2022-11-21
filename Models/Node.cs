@@ -25,7 +25,7 @@ namespace Enter_The_Matrix.Models
 
 	public Node()
 	{
-	    ParentId = [""];
+	    ParentId = new string[]{""};
             Id = "";
 	    EntityType = "person"
 	    EntityDescription = "";
