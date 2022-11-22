@@ -866,11 +866,10 @@
                 else { sections[i].style.display = "none"; }
             }
             let slideMenu = document.getElementById('mitre-menu')._slideMenu;
-            slideMenu.level = 1;
-            slideMenu.back();
+            slideMenu.navigateTo('#filter-home');
         }
 
-        document.onload(showThumbnail());
+        document.addEventListener('DOMContentLoaded', showThumbnail());
 
         function showThumbnail() {
             var thumb = document.getElementById("node-thumbnail");
