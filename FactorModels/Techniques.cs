@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
             #region tactics/enterprise
 
             htmlContent.Add("<li>");
-            htmlContent.Add("<a href='javascript:void(0)'>ENTERPRISE</a>");
+            htmlContent.Add("<a id='filter-home' href='javascript:void(0)'>ENTERPRISE</a>");
             htmlContent.Add("<ul>");
 
             #region tactics TA0043
