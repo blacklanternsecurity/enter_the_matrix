@@ -180,7 +180,7 @@ namespace Enter_The_Matrix.Controllers
             }
             else if (!riskList.Contains(step.Risk))
             {
-                return BadRequest("The risk supplied is invalid. Must be one of: " + String.Join(", ", riskList));
+                return BadRequest("The risk supplied is invalid. Must be one of: " + string.Join(", ", riskList));
             }
 
             List<string> relevanceList = new List<string>();
@@ -191,7 +191,7 @@ namespace Enter_The_Matrix.Controllers
             }
             else if (!relevanceList.Contains(step.Relevance))
             {
-                return BadRequest("The relevance supplied is invalid. Must be one of: " + String.Join(", ", relevanceList));
+                return BadRequest("The relevance supplied is invalid. Must be one of: " + string.Join(", ", relevanceList));
             }
 
             if (step.Likelihood == null || step.Likelihood == "") 
@@ -200,7 +200,7 @@ namespace Enter_The_Matrix.Controllers
             }
             else if (!riskList.Contains(step.Likelihood))
             {
-                return BadRequest("The likelihood supplied is invalid. Must be one of: " + String.Join(", ", riskList));
+                return BadRequest("The likelihood supplied is invalid. Must be one of: " + string.Join(", ", riskList));
             }
 
             ThreatSources ts = new ThreatSources();
@@ -210,7 +210,7 @@ namespace Enter_The_Matrix.Controllers
             }
             else if (!ts.sources.Contains(step.ThreatSource))
             {
-                return BadRequest("The threat source supplied is invalid. Must be one of: " + String.Join(", ", ts.sources));
+                return BadRequest("The threat source supplied is invalid. Must be one of: " + string.Join(", ", ts.sources));
             }
 
             Techniques mitre = new Techniques("");
@@ -228,66 +228,6 @@ namespace Enter_The_Matrix.Controllers
             {
                 return BadRequest("Event should describe what is happening. Should not be empty or null.");
             }
-
-            // Validate the GraphNode
-            if (step.GraphNode != null)
-            {
-                step.GraphNode.Id = step.Id;
-                step.GraphNode.Risk = step.Risk;
-                if (step.GraphNode.EntityType == null || step.GraphNode.EntityType == "")
-                {
-                    step.GraphNode.EntityType = "autonomous-system";
-                }
-                else
-                {
-                    EntityTypes et = new EntityTypes();
-                    Dictionary<string, string> entities = et.getTypes();
-                    if (!entities.ContainsKey(step.GraphNode.EntityType))
-                    {
-                        return BadRequest("Supplied GraphNode EntityType is invalid. Please use one of the following: " + String.Join(", ", entities.Keys));
-                    }
-                }
-                if (step.GraphNode.EntityDescription == null || step.GraphNode.EntityDescription == "")
-                {
-                    step.GraphNode.EntityDescription = " ";
-                }
-                if (step.GraphNode.ParentId == null) { step.GraphNode.ParentId = new string[] { null }; }
-                foreach (string pId in step.GraphNode.ParentId)
-                {
-                    if (pId == null) { continue; }
-                    else
-                    {
-                        // We need to make sure the parent node exists
-                        Steps p;
-                        try
-                        {
-                            p = await _stepsService.GetByIdAsync(pId);
-                        }
-                        catch
-                        {
-                            return BadRequest();
-                        }
-                        if (p == null)
-                        {
-                            return NotFound("One of the parent nodes in the supplied event does not exist.");
-                        }
-
-                        // We need to make sure the parent node belongs to the same scenario
-                        foreach (Scenarios scenario in await _scenariosService.GetAllAsync())
-                        {
-                            if (scenario.Steps.Contains(id))
-                            {
-                                if (!scenario.Steps.Contains(pId))
-                                {
-                                    return NotFound("One of the parent nodes in the supplied event does not belong to the same scenario.");
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
 
             try
             {
@@ -378,7 +318,7 @@ namespace Enter_The_Matrix.Controllers
                 }
                 else if (!riskList.Contains(step.Risk))
                 {
-                    return BadRequest("The risk supplied is invalid. Must be one of: " + String.Join(", ", riskList));
+                    return BadRequest("The risk supplied is invalid. Must be one of: " + string.Join(", ", riskList));
                 }
 
                 List<string> relevanceList = new List<string>();
@@ -389,7 +329,7 @@ namespace Enter_The_Matrix.Controllers
                 }
                 else if (!relevanceList.Contains(step.Relevance))
                 {
-                    return BadRequest("The relevance supplied is invalid. Must be one of: " + String.Join(", ", relevanceList));
+                    return BadRequest("The relevance supplied is invalid. Must be one of: " + string.Join(", ", relevanceList));
                 }
 
                 if (step.Likelihood == null || step.Likelihood == "")
@@ -398,7 +338,7 @@ namespace Enter_The_Matrix.Controllers
                 }
                 else if (!riskList.Contains(step.Likelihood))
                 {
-                    return BadRequest("The likelihood supplied is invalid. Must be one of: " + String.Join(", ", riskList));
+                    return BadRequest("The likelihood supplied is invalid. Must be one of: " + string.Join(", ", riskList));
                 }
 
                 ThreatSources ts = new ThreatSources();
@@ -408,7 +348,7 @@ namespace Enter_The_Matrix.Controllers
                 }
                 else if (!ts.sources.Contains(step.ThreatSource))
                 {
-                    return BadRequest("The threat source supplied is invalid. Must be one of: " + String.Join(", ", ts.sources));
+                    return BadRequest("The threat source supplied is invalid. Must be one of: " + string.Join(", ", ts.sources));
                 }
 
                 Techniques mitre = new Techniques("");
@@ -442,7 +382,7 @@ namespace Enter_The_Matrix.Controllers
                         Dictionary<string, string> entities = et.getTypes();
                         if (!entities.ContainsKey(step.GraphNode.EntityType))
                         {
-                            return BadRequest("Supplied GraphNode EntityType is invalid. Please use one of the following: " + String.Join(", ", entities.Keys));
+                            return BadRequest("Supplied GraphNode EntityType is invalid. Please use one of the following: " + string.Join(", ", entities.Keys));
                         }
                     }
                     if (step.GraphNode.EntityDescription == null || step.GraphNode.EntityDescription == "")
