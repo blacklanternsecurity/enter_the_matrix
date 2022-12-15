@@ -16,5 +16,6 @@ namespace Enter_The_Matrix.Models
         public List<string> EventPrivileges { get; set; }
         public List<string> TemplatePrivileges { get; set; }
         public List<string> MetricsPrivileges { get; set; }
+        public string AssessmentId { get; set; }
     }
 }

@@ -21,6 +21,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
 using System;
+using System.Collections.Generic;
+using Microsoft.OpenApi.Models;
+using System.Linq;
 
 namespace Enter_The_Matrix
 {
@@ -64,7 +67,37 @@ namespace Enter_The_Matrix
             services.AddScoped<TreeService>();
             services.AddScoped<MetricsService>();
             services.AddScoped<KeyService>();
-            
+
+            // Swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.AddSecurityDefinition("X-Api-Key", new OpenApiSecurityScheme
+                {
+                    Description = "API key authorization header. Example: \"X-Api-Key: {token}\"",
+                    Name = "X-Api-Key",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "ApiKeyScheme"
+                });
+
+                var key = new OpenApiSecurityScheme()
+                {
+                    Reference = new OpenApiReference()
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "X-Api-Key"
+                    },
+                    In = ParameterLocation.Header
+                };
+
+                var requirement = new OpenApiSecurityRequirement
+                {
+                    { key, new List<string>() }
+                };
+
+                c.AddSecurityRequirement(requirement);
+            });
+
             // Auth Cookies
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
@@ -132,7 +165,10 @@ namespace Enter_The_Matrix
             app.UseCookiePolicy();
             app.UseAuthentication();
 
-
+            // Swagger
+            app.UseSwagger();
+            app.UseSwaggerUI();
+    
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

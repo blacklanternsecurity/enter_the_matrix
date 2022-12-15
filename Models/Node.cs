@@ -23,6 +23,15 @@ namespace Enter_The_Matrix.Models
             Risk = risk;
         }
 
+	public Node()
+	{
+	    ParentId = new string[]{""};
+            Id = "";
+	    EntityType = "person";
+	    EntityDescription = "";
+	    Risk = "Very Low";
+	}
+
         public string GetRiskColor()
         {
             if (Risk == "Very Low") { return "cyan"; }

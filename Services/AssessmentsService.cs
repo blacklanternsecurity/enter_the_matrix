@@ -11,6 +11,7 @@
 using Enter_The_Matrix.Models;
 using MongoDB.Driver;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Enter_The_Matrix.Services
@@ -50,6 +51,11 @@ namespace Enter_The_Matrix.Services
         public async Task DeleteAsync(string id)
         {
             await _assessments.DeleteOneAsync(a => a.Id == id);
+        }
+
+        public async Task<Assessments> GetByScenarioIdAsync(string scenarioId)
+        {
+            return await _assessments.Find<Assessments>(a => a.Scenarios.Contains(scenarioId)).FirstOrDefaultAsync();
         }
     }
 }

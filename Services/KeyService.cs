@@ -13,8 +13,6 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -50,7 +48,7 @@ namespace Enter_The_Matrix.Services
 
             bool authenticated = false;
             bool authorized = false;
-            string privilege = "";
+            string privilege;
 
             switch (operation)
             {
@@ -71,14 +69,8 @@ namespace Enter_The_Matrix.Services
                     break;
             }
 
-            // Hash the passed in key
-            var passwordHasher = new PasswordHasher<Key>();
-            Key retKey = null;
-            foreach (Key key in await GetKeys(false)){
-                var result = passwordHasher.VerifyHashedPassword(key, key.Hash, keyPlain);
-                if (result == PasswordVerificationResult.Success) { authenticated = true; retKey = key; break; }
-                else if (result == PasswordVerificationResult.SuccessRehashNeeded) { authenticated = true; retKey = key; break; }
-            }
+            Key retKey = await CheckAuthentication(keyPlain);
+            if (retKey != null) { authenticated = true; }
 
             if (authenticated)
             {
@@ -108,12 +100,42 @@ namespace Enter_The_Matrix.Services
             return authorized;
         }
 
+        public async Task<Key> CheckAuthentication(string keyPlain)
+        {
+            // Hash the passed in key
+            var passwordHasher = new PasswordHasher<Key>();
+            Key retKey = null;
+            foreach (Key key in await GetKeys(false))
+            {
+                var result = passwordHasher.VerifyHashedPassword(key, key.Hash, keyPlain);
+                if (result == PasswordVerificationResult.Success) { retKey = key; break; }
+                else if (result == PasswordVerificationResult.SuccessRehashNeeded) { retKey = key; break; }
+            }
+            return retKey;
+        }
+
+        public async Task<string> ValidateAssessment(string keyPlain)
+        {
+            string authorizedFor = "";
+            bool authenticated = false;
+
+            Key retKey = await CheckAuthentication(keyPlain);
+            if (retKey != null) { authenticated = true; }
+
+            if (authenticated)
+            {
+                authorizedFor = retKey.AssessmentId;
+            }
+            return authorizedFor;
+        }
+
         public async Task<string> AddKey(string name, 
             List<string> assessmentPrivileges, 
             List<string> scenarioPrivileges,
             List<string> eventPrivileges,
             List<string> templatePrivileges,
-            List<string> metricsPrivileges)
+            List<string> metricsPrivileges,
+            string assessmentId)
         {
             Key check = await _keys.Find<Key>(k => k.Name == name).FirstOrDefaultAsync();
             
@@ -128,6 +150,7 @@ namespace Enter_The_Matrix.Services
             key.EventPrivileges = eventPrivileges;
             key.TemplatePrivileges = templatePrivileges;
             key.MetricsPrivileges = metricsPrivileges;
+            key.AssessmentId = assessmentId;
 
             // Using MSFT Built-In GUID generation
             string keyVal = Guid.NewGuid().ToString();

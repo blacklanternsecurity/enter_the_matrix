@@ -49,6 +49,7 @@ namespace Enter_The_Matrix.Controllers
             return Content(JsonConvert.SerializeObject(sortedUsed), "application/json");
         }
 
+        [HttpGet]
         public async Task<IActionResult> GetAttackChains()
         {
             Dictionary<string, List<(string, string)>> chains = await _metricsService.GetAttackChains();
@@ -66,6 +67,7 @@ namespace Enter_The_Matrix.Controllers
             return Content(JsonConvert.SerializeObject(returnChains), "application/json");
         }
 
+        [HttpGet]
         public async Task<IActionResult> GetCommonStarts()
         {
             Dictionary<string, (int, List<string>)> events = await _metricsService.GetCommonEvents(0);
@@ -80,6 +82,7 @@ namespace Enter_The_Matrix.Controllers
             return Content(JsonConvert.SerializeObject(returnEvents), "application/json");
         }
 
+        [HttpGet]
         public async Task<IActionResult> GetCommonEnds()
         {
             Dictionary<string, (int, List<string>)> events = await _metricsService.GetCommonEvents(-1);
