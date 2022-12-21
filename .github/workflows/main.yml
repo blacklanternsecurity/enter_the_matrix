@@ -1,0 +1,4 @@
+- name: Auto-assign Issue
+  uses: pozil/auto-assign-issue@v1.11.0
+  with:
+    assignees: debifrank
