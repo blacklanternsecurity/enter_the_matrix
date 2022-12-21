@@ -13,4 +13,4 @@ jobs:
               with:
                   assignees: debifrank
                   numOfAssignee: 1
-                  allowSelfAssign: false
+                  allowSelfAssign: true
